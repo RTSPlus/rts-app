@@ -2,26 +2,20 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import MapView from "react-native-maps";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
+import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 
 function App() {
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
-        <StatusBar style="dark" />
-        <MapView style={styles.map} />
-        {/* Todo: Refacto the blurry view out */}
-        <SafeAreaInsetsContext.Consumer>
-          {(insets) => (
-            <BlurView style={{ ...styles.statusBar, height: insets.top }} />
-          )}
-        </SafeAreaInsetsContext.Consumer>
+        <RTSMapView style={styles.map} />
+        <StatusBarBlurry />
         <Text style={{ backgroundColor: "red" }}>
           Open up App.js to start working on your app!
         </Text>
@@ -30,6 +24,19 @@ function App() {
   );
 }
 registerRootComponent(App);
+
+function StatusBarBlurry() {
+  return (
+    <>
+      <StatusBar style="dark" />
+      <SafeAreaInsetsContext.Consumer>
+        {(insets) => (
+          <BlurView style={{ ...styles.statusBar, height: insets.top }} />
+        )}
+      </SafeAreaInsetsContext.Consumer>
+    </>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
