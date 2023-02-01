@@ -1,6 +1,8 @@
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
+import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import {
   SafeAreaInsetsContext,
@@ -11,6 +13,19 @@ import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 
 function App() {
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        // Handle permission denied
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      console.log(location);
+    })();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <View style={styles.container}>
