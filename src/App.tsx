@@ -2,7 +2,7 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+
 import { StyleSheet, Text, View } from "react-native";
 import {
   SafeAreaInsetsContext,
@@ -12,16 +12,30 @@ import {
 import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 
+import React, { useEffect, useCallback, useRef, useMemo } from "react";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+
 function App() {
+
+  // hooks
+  const sheetRef = useRef<BottomSheet>(null);
+
+  const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
+
+  // callbacks
+  const handleSheetChange = useCallback((index) => {
+    console.log("handleSheetChange", index);
+  }, []);
+
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         // Handle permission denied
         return;
-      }
+  }
 
-      const location = await Location.getCurrentPositionAsync({});
+  const location = await Location.getCurrentPositionAsync({});
       console.log(location);
     })();
   }, []);
@@ -31,9 +45,16 @@ function App() {
       <View style={styles.container}>
         <RTSMapView style={styles.map} />
         <StatusBarBlurry />
-        <Text style={{ backgroundColor: "red" }}>
-          Open up App.js to start working on your app!
-        </Text>
+        <BottomSheet
+        ref={sheetRef}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChange}
+        >
+        <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+          <Text> Hello </Text>
+        </BottomSheetScrollView>
+      </BottomSheet>
       </View>
     </SafeAreaProvider>
   );
@@ -76,5 +97,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
+  },
+  itemContainer: {
+    padding: 6,
+    margin: 6,
+    backgroundColor: "#eee",
+  },
+  contentContainer: {
+    backgroundColor: "white",
   },
 });
