@@ -72,6 +72,21 @@ async function apiRequest(
   });
 }
 
+export async function getRoutes() {
+  const response = await apiRequest(endpoints.GET_ROUTES);
+
+  return new Promise((res, rej) => {
+    response
+      .json()
+      .then((data) => {
+        const routes = data["bustime-response"]["routes"];
+
+        res(routes);
+      })
+      .catch((err) => rej(err));
+  });
+}
+
 const PROJECTED_DISTANCE_SCALING_FACTOR = 0.98;
 export async function getRoutePattern(rt: number): Promise<Route> {
   const response = await apiRequest(endpoints.GET_ROUTE_PATTERNS, { rt });
