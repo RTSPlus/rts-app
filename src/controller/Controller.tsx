@@ -4,12 +4,12 @@ import {
   QueryClientProvider,
   onlineManager,
   focusManager,
-  useQuery,
-  useQueries,
 } from "@tanstack/react-query";
 import { PropsWithChildren, useEffect } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
-import { getRoutePattern, getRoutes } from "../rts-api/rts";
+
+import { useAvailableRoutes } from "./useAvailableRoutes";
+import { getRoutePattern } from "../rts-api/rts";
 
 const queryClient = new QueryClient();
 
@@ -20,32 +20,16 @@ function onAppStateChange(status: AppStateStatus) {
 }
 
 export function ControllerReact(props: PropsWithChildren) {
-  const { data } = useQuery({
-    queryKey: ["getRoutes"],
-    queryFn: getRoutes,
-  });
+  const { data: availableRoutes } = useAvailableRoutes();
 
   useEffect(() => {
-    console.log(data);
-    if (data) {
-      console.log(data.map((route) => parseInt(route["rt"])));
-    }
-  }, [data]);
-
-  const routePatternList = data ? data.map((rt) => parseInt(rt["rt"])) : [];
-
-  const routePatternQueries = useQueries({
-    queries: routePatternList.map((rt) => {
-      return {
-        queryKey: ["routePattern", rt],
-        queryFn: () => getRoutePattern(rt),
-      };
-    }),
-  });
-
-  useEffect(() => {
-    console.log(routePatternQueries);
-  }, [routePatternQueries]);
+    (availableRoutes ?? []).forEach(({ num, name, color }) => {
+      queryClient.prefetchQuery({
+        queryKey: ["routePattern", num],
+        queryFn: () => getRoutePattern(num, name, color),
+      });
+    });
+  }, [availableRoutes]);
 
   return <>{props.children}</>;
 }
