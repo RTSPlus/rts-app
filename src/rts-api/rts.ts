@@ -72,23 +72,40 @@ async function apiRequest(
   });
 }
 
+type RouteData = {
+  num: number;
+  name: string;
+  color: string;
+};
+
 export async function getRoutes() {
   const response = await apiRequest(endpoints.GET_ROUTES);
 
-  return new Promise((res, rej) => {
+  return new Promise<RouteData[]>((res, rej) => {
     response
       .json()
       .then((data) => {
         const routes = data["bustime-response"]["routes"];
-
-        res(routes);
+        res(
+          routes.map(
+            (rt: { [x: string]: any }): RouteData => ({
+              num: parseInt(rt["rt"], 10),
+              name: rt["rtnm"],
+              color: rt["rtclr"],
+            })
+          )
+        );
       })
       .catch((err) => rej(err));
   });
 }
 
 const PROJECTED_DISTANCE_SCALING_FACTOR = 0.98;
-export async function getRoutePattern(rt: number): Promise<Route> {
+export async function getRoutePattern(
+  rt: number,
+  name: string,
+  color: string
+): Promise<Route> {
   const response = await apiRequest(endpoints.GET_ROUTE_PATTERNS, { rt });
 
   return new Promise((res, rej) => {
@@ -174,8 +191,8 @@ export async function getRoutePattern(rt: number): Promise<Route> {
         // TODO: get the route name and color
         const route: Route = {
           num: rt,
-          name: "",
-          color: "",
+          name,
+          color,
           path: paths.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {}),
         };
 
