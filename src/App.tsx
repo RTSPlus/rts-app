@@ -15,6 +15,8 @@ import { colors } from "./colors";
 import React, { useEffect, useCallback, useRef, useMemo } from "react";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
+import BusInformationView from "./Components/BusInformationView";
+
 function App() {
 
   // hooks
@@ -52,7 +54,7 @@ function App() {
         onChange={handleSheetChange}
         >
         <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-          <Text> Hello </Text>
+          <BusInformationView />
         </BottomSheetScrollView>
       </BottomSheet>
       </View>
