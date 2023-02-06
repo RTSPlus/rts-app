@@ -13,7 +13,6 @@
     "@gorhom/bottom-sheet": "^4",
     "@react-native-community/netinfo": "^9.3.7",
     "@tanstack/react-query": "^4.24.4",
-    "@types/react": "^18.0.27",
     "@types/react-native": "^0.71.1",
     "@types/tinycolor2": "^1.4.3",
     "crypto-js": "^4.1.1",
@@ -36,11 +35,13 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@types/crypto-js": "^4.1.1",
+    "@types/react": "^18.0.27",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "eslint": "^8.33.0",
     "eslint-config-universe": "^11.1.1",
     "prettier": "^2.8.3",
+    "react-devtools": "^4.27.1",
     "react-native-dotenv": "^3.4.7"
   },
   "private": true,
