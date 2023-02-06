@@ -1,7 +1,9 @@
+import { useQueries } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ViewProps } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 
+import { useAvailableRoutes } from "../controller/useAvailableRoutes";
 import { getRoutePattern } from "../rts-api/rts";
 
 // TODO testing only
@@ -20,37 +22,37 @@ const initialRegion = {
 };
 
 export default function RTSMapView(props: ViewProps) {
-  const [coordinates, setCoordinates] = useState([
-    {
-      latitude: bounds.lat_max,
-      longitude: bounds.lon_max,
-    },
-    {
-      latitude: bounds.lat_min,
-      longitude: bounds.lon_min,
-    },
-  ]);
+  const { data: availableRoutes } = useAvailableRoutes();
 
-  useEffect(() => {
-    getRoutePattern(5).then((res) => {
-      console.log(res.path[323]);
-      setCoordinates(
-        res.path[323].path.map((point) => ({
-          latitude: point.lat,
-          longitude: point.lon,
-        }))
-      );
-    });
-  }, []);
+  const [selectedRoutes, setSelectedRoutes] = useState<number[]>([5, 20]);
+
+  // Intersection of selectedRoutes and availableRoutes
+  const availableSelectedRoutes = (availableRoutes ?? []).filter((e) =>
+    selectedRoutes.includes(e.num)
+  );
+
+  const patternQueries = useQueries({
+    queries: availableSelectedRoutes.map(({ num, name, color }) => ({
+      queryKey: ["routePattern", num],
+      queryFn: () => getRoutePattern(num, name, color),
+    })),
+  });
+  const routePatterns = patternQueries.filter((e) => e.data).map((e) => e.data);
 
   return (
     <MapView {...props} initialRegion={initialRegion}>
-      <Polyline
-        coordinates={coordinates}
-        strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-        strokeColors={["#7F0000", "blue"]}
-        strokeWidth={3}
-      />
+      {routePatterns.map((rt) => (
+        <Polyline
+          key={rt.num}
+          coordinates={Object.values(rt.path)[0].path.map((pt) => ({
+            latitude: pt.lat,
+            longitude: pt.lon,
+          }))}
+          strokeColor={rt.color}
+          strokeColors={[rt.color]}
+          strokeWidth={3}
+        />
+      ))}
     </MapView>
   );
 }
