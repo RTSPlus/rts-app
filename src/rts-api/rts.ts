@@ -113,7 +113,6 @@ export async function getRoutePattern(
       .json()
       .then((data) => {
         const pathResponse = data["bustime-response"]["ptr"];
-        console.log(pathResponse);
 
         const paths: RoutePath[] = pathResponse.map((path: any) => {
           path["pt"].sort(
