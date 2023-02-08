@@ -1,24 +1,21 @@
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useCallback, useRef, useMemo } from "react";
+import { StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
+import BusInformationView from "./Components/BusInformationView";
 import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
-
-import React, { useEffect, useCallback, useRef, useMemo } from "react";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-
-import BusInformationView from "./Components/BusInformationView";
+import { ControllerProvider } from "./controller/Controller";
 
 function App() {
-
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -35,29 +32,33 @@ function App() {
       if (status !== "granted") {
         // Handle permission denied
         return;
-  }
+      }
 
-  const location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({});
       console.log(location);
     })();
   }, []);
 
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <RTSMapView style={styles.map} />
-        <StatusBarBlurry />
-        <BottomSheet
-        ref={sheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        onChange={handleSheetChange}
-        >
-        <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
-          <BusInformationView />
-        </BottomSheetScrollView>
-      </BottomSheet>
-      </View>
+      <ControllerProvider>
+        <View style={styles.container}>
+          <RTSMapView style={styles.map} />
+          <StatusBarBlurry />
+          <BottomSheet
+            ref={sheetRef}
+            index={1}
+            snapPoints={snapPoints}
+            onChange={handleSheetChange}
+          >
+            <BottomSheetScrollView
+              contentContainerStyle={styles.contentContainer}
+            >
+              <BusInformationView />
+            </BottomSheetScrollView>
+          </BottomSheet>
+        </View>
+      </ControllerProvider>
     </SafeAreaProvider>
   );
 }
