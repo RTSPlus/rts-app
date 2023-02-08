@@ -18,7 +18,6 @@ import { ControllerProvider } from "./controller/Controller";
 function App() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
-
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
 
   // callbacks
@@ -51,11 +50,13 @@ function App() {
             snapPoints={snapPoints}
             onChange={handleSheetChange}
           >
-            <BottomSheetScrollView
+            {/*  Scroll View breaks Google Autocomplete */}
+            {/* <BottomSheetScrollView
+              horizontal = {false}
               contentContainerStyle={styles.contentContainer}
-            >
+            > */}
               <BusInformationView />
-            </BottomSheetScrollView>
+            {/* </BottomSheetScrollView> */}
           </BottomSheet>
         </View>
       </ControllerProvider>
