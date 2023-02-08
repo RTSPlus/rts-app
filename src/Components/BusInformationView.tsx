@@ -4,6 +4,7 @@ import { VStack, Box, Container, NativeBaseProvider, HStack, Center } from 'nati
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { RTS_GOOGLE_API_KEY } from '@env';
 
 const BusInformationView = () => {
 
@@ -38,7 +39,7 @@ const BusInformationView = () => {
                   }}
                     placeholder="Type a place"
                     minLength={2} // minimum length of text to search
-                    query={{key: 'AIzaSyDpt04L4v6MW9WRYyNC7yhTDl0iORezCHM'}}
+                    query={{key: RTS_GOOGLE_API_KEY}}
                     fetchDetails={true}
                     listViewDisplayed="auto"
                     listEmptyComponent={() => (
