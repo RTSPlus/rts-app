@@ -1,10 +1,12 @@
 import { useQueries } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ViewProps } from "react-native";
-import MapView, { Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 
+import { useVehicleLocations } from "./useVehicleLocations";
 import { useAvailableRoutes } from "../controller/useAvailableRoutes";
 import { getRoutePattern } from "../rts-api/rts";
+import { hasPresentKey } from "ts-is-present";
 
 // TODO testing only
 const bounds = {
@@ -37,7 +39,12 @@ export default function RTSMapView(props: ViewProps) {
       queryFn: () => getRoutePattern(num, name, color),
     })),
   });
-  const routePatterns = patternQueries.filter((e) => e.data).map((e) => e.data);
+  const routePatterns = patternQueries
+    .filter(hasPresentKey("data"))
+    .map((e) => e.data);
+
+  const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
+  console.log(vehicleLocations);
 
   return (
     <MapView {...props} initialRegion={initialRegion}>
@@ -53,6 +60,19 @@ export default function RTSMapView(props: ViewProps) {
           strokeWidth={3}
         />
       ))}
+      {vehicleLocations
+        .flatMap((e) => e.data ?? [])
+        .map((e) => (
+          <Marker
+            key={e.vid}
+            coordinate={{
+              latitude: e.lat,
+              longitude: e.lon,
+            }}
+            title={e.vid.toString()}
+            description={e.des}
+          />
+        ))}
     </MapView>
   );
 }
