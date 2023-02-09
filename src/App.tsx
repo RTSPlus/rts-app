@@ -51,7 +51,6 @@ function App() {
             onChange={handleSheetChange}
             style={styles.container}
           >
-            {/*  Scroll View breaks Google Autocomplete */}
             <BottomSheetScrollView
               horizontal = {true}
               contentContainerStyle={styles.contentContainer}
