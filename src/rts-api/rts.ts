@@ -61,7 +61,7 @@ async function buildURL(
   } as const;
 }
 
-async function apiRequest(
+export async function apiRequest(
   endpoint: (typeof endpoints)[keyof typeof endpoints],
   params: Record<string, unknown> = {},
   xtime: number = Math.floor(Date.now())
@@ -79,18 +79,16 @@ async function apiRequest(
   });
 }
 
-type RouteData = {
+export type RouteData = {
   num: number;
   name: string;
   color: string;
 };
 
 export async function getRoutes() {
-  const response = await apiRequest(endpoints.GET_ROUTES);
-
   return new Promise<RouteData[]>((res, rej) => {
-    response
-      .json()
+    apiRequest(endpoints.GET_ROUTES)
+      .then((response) => response.json())
       .then((data) => {
         const routes = data["bustime-response"]["routes"];
         res(
