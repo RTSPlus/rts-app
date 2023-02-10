@@ -49,14 +49,14 @@ function App() {
             index={1}
             snapPoints={snapPoints}
             onChange={handleSheetChange}
+            style={styles.container}
           >
-            {/*  Scroll View breaks Google Autocomplete */}
-            {/* <BottomSheetScrollView
-              horizontal = {false}
+            <BottomSheetScrollView
+              horizontal = {true}
               contentContainerStyle={styles.contentContainer}
-            > */}
+            >
               <BusInformationView />
-            {/* </BottomSheetScrollView> */}
+            </BottomSheetScrollView>
           </BottomSheet>
         </View>
       </ControllerProvider>
@@ -102,12 +102,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: "#eee",
-  },
   contentContainer: {
+    width:"95%",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "white",
   },
 });
