@@ -1,62 +1,96 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, SafeAreaView} from 'react-native';
-import { VStack, Box, Container, NativeBaseProvider, HStack, Center } from 'native-base';
+import React, { useCallback, useMemo, useRef } from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { VStack, Box, Container, NativeBaseProvider, HStack } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { RTS_GOOGLE_API_KEY } from '@env';
+import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import {Dimensions} from 'react-native';
 
 const BusInformationView = () => {
 
-  const buttonClickedHandler = () => {
+  const snapPoints = useMemo(() => [800, 900], []);
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const handlePresentPress = () => bottomSheetModalRef.current.present();
+  const handleClosePress = () => bottomSheetModalRef.current.dismiss();
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+  
+  const busClickedHandler = () => {
+    console.log('You have been clicked a button!');
+  };
+
+  const busInfoClickedHandler = () => {
+    console.log('You have been clicked a button!');
+  };
+
+  const moreClickedHandler = () => {
+    console.log('You have been clicked a button!');
+  };
+
+  const moreRoutesClickedHandler = () => {
+    console.log('You have been clicked a button!');
+  };
+
+  const locationClickedHandler = () => {
     console.log('You have been clicked a button!');
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} >
 
-      <NativeBaseProvider config={config}>
+      <NativeBaseProvider config={config} >
 
-        <Container alignItems="center">
+        <Container style={styles.container}>
 
           <Box borderX="1" borderRadius="md" >
 
             <VStack space='2' alignItems="center">
 
-              <HStack width="95%">
-                <GooglePlacesAutocomplete
-                  styles={{
-                    container: {
-                      flex: 1,
-                    },
-                    description: {
-                      color: 'grey',
-                      fontSize: 16,
-                    },
-                      predefinedPlacesDescription: {
-                      color: '#3caf50',
-                    },
-                  }}
-                    placeholder="Type a place"
-                    minLength={2} // minimum length of text to search
-                    query={{key: RTS_GOOGLE_API_KEY}}
-                    fetchDetails={true}
-                    listViewDisplayed="auto"
-                    listEmptyComponent={() => (
-                      <View style={{flex: 1}}>
-                        <Text>No results were found</Text>
-                      </View>
-                    )}
-                    onPress={(data, details = null) => 
-                      console.log(data, details)
-                    }
-                  />
-                <TouchableOpacity>
-                  <Icon name="bus" size={50} color="grey" alignSelf="center"/> 
-                </TouchableOpacity>
-              </HStack>
+              {/* 
+                Google Places Autocomplete and Bus Information Button View
+              */}
+              <View style={styles.container}>
 
-              <HStack width="90%" space="75%">
+                <HStack space='5' style={styles.container}>
+                  <ScrollView horizontal={true} >
+                    <GooglePlacesAutocomplete
+                      styles={{
+                        description: {
+                          color: 'grey',
+                          fontSize: 16,
+                        },
+                          predefinedPlacesDescription: {
+                          color: '#3caf50',
+                        },
+                      }}
+                        query={{key: RTS_GOOGLE_API_KEY}}
+                        keepResultsAfterBlur={true}
+                        enablePoweredByContainer={false}
+                        disableScroll={true}
+                        isRowScrollable={false}
+                        fetchDetails={true}
+                        minLength={2}
+                        placeholder="Type a place"
+                        listViewDisplayed='auto'
+                        onPress={(data, details = null) => 
+                          console.log(data, details)
+                        }/>
+                  </ScrollView>
+                  <TouchableOpacity style={{alignSelf:'flex-start'}}>
+                    <Icon name="bus" size={40} color="grey"/> 
+                  </TouchableOpacity>
+                </HStack>
+              </View>
+
+              {/* 
+                Favorites container header and more button
+              */}
+              <HStack width="100%" space="75%">
                 <Text 
                   style={{
                   justifyContent: 'flex-start',
@@ -76,6 +110,9 @@ const BusInformationView = () => {
                 </TouchableOpacity>
               </HStack>
 
+              {/* 
+                Favorites information container
+              */}
               <Box bg={{
                 linearGradient: {
                   colors: ['#D7CECE', '#D7CECE'],
@@ -90,24 +127,27 @@ const BusInformationView = () => {
                 }}>
                 <HStack space={5} alignItems="center">
                     <TouchableOpacity
-                        onPress={buttonClickedHandler}
+                        onPress={busClickedHandler}
                         style={styles.roundButton1}>
                         <Icon name="bus" size={45} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={buttonClickedHandler}
+                        onPress={busClickedHandler}
                         style={styles.roundButton1}>
                         <Icon name="bus" size={45} color="white" />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={buttonClickedHandler}
+                        onPress={busClickedHandler}
                         style={styles.roundButton1}>
                         <Icon name="bus" size={45} color="white" />
                     </TouchableOpacity>
                 </HStack>
               </Box>
 
-              <HStack width="90%" space="50%">
+              {/* 
+                Routes near you header and all routes button
+              */}
+              <HStack width="100%" space="50%">
                 <Text 
                 style={{
                   justifyContent: 'flex-start',
@@ -115,18 +155,21 @@ const BusInformationView = () => {
                 }}>
                   routes near you
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handlePresentPress}>
                   <Text 
                   style={{
                     justifyContent: 'flex-end',
                     alignItems: 'flex-end',
                     color:'grey'
                   }}>
-                    more routes
+                    all routes
                   </Text>
                 </TouchableOpacity>
               </HStack>
 
+              {/* 
+                Routes Information Container
+              */}
               <Box width="100%" bg={{
                 linearGradient: {
                   colors: ['#D7CECE', '#D7CECE'],
@@ -139,10 +182,29 @@ const BusInformationView = () => {
                   color: 'warmGray.50',
                   textAlign: 'center'
                 }}>
-                Busses in View
+                <HStack space={5} alignItems="center">
+                    <TouchableOpacity
+                        onPress={busClickedHandler}
+                        style={styles.roundButton1}>
+                        <Icon name="bus" size={45} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={busClickedHandler}
+                        style={styles.roundButton1}>
+                        <Icon name="bus" size={45} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={busClickedHandler}
+                        style={styles.roundButton1}>
+                        <Icon name="bus" size={45} color="white" />
+                    </TouchableOpacity>
+                </HStack>
               </Box>
 
-              <HStack width="90%" space="60%">
+              {/* 
+                Recents header
+              */}
+              <HStack width="100%">
                 <Text 
                   style={{
                   justifyContent: 'flex-start',
@@ -152,6 +214,9 @@ const BusInformationView = () => {
                   </Text>
               </HStack>
 
+              {/* 
+                Recents Information Container
+              */}
               <Box width="100%"  bg={{
                 linearGradient: {
                   colors: ['#D7CECE', '#D7CECE'],
@@ -164,7 +229,7 @@ const BusInformationView = () => {
                   color: 'warmGray.50',
                   textAlign: 'center'
                 }}>
-                Contact Us
+
               </Box>
 
             </VStack>
@@ -174,7 +239,7 @@ const BusInformationView = () => {
         </Container>
 
       </NativeBaseProvider>
-
+    
     </View>
   );
 };
@@ -188,23 +253,30 @@ const config = {
 };
 
 const styles = StyleSheet.create({
+  modal:{
+    width:Dimensions.get('screen').width,
+  },
   subheading:{
-    flex: 1,
+    flex:1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   },
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   roundButton1: {
-    width: 75,
-    height: 75,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 75,
+    height: 75,
     padding: 10,
     borderRadius: 100,
-    backgroundColor: '#D8D8D8',
+    backgroundColor: 'grey',
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    elevation: 2,
+    shadowRadius: 15 ,
+    shadowOffset : { width: 1, height: 5},
   },
 });

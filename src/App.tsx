@@ -9,13 +9,14 @@ import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-
 import BusInformationView from "./Components/BusInformationView";
 import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
+import {Dimensions} from 'react-native';
 
 function App() {
+  
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
@@ -44,20 +45,18 @@ function App() {
         <View style={styles.container}>
           <RTSMapView style={styles.map} />
           <StatusBarBlurry />
-          <BottomSheet
-            ref={sheetRef}
-            index={1}
-            snapPoints={snapPoints}
-            onChange={handleSheetChange}
-          >
-            {/*  Scroll View breaks Google Autocomplete */}
-            {/* <BottomSheetScrollView
-              horizontal = {false}
-              contentContainerStyle={styles.contentContainer}
-            > */}
-              <BusInformationView />
-            {/* </BottomSheetScrollView> */}
-          </BottomSheet>
+            <BottomSheet
+              ref={sheetRef}
+              index={1}
+              snapPoints={snapPoints}
+              onChange={handleSheetChange}
+              style={styles.container}>
+              <BottomSheetScrollView
+                horizontal = {false}
+                contentContainerStyle={styles.contentContainer}>
+                <BusInformationView />
+              </BottomSheetScrollView>
+            </BottomSheet>
         </View>
       </ControllerProvider>
     </SafeAreaProvider>
@@ -102,12 +101,10 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: "#eee",
-  },
   contentContainer: {
-    backgroundColor: "white",
-  },
+    width: Dimensions.get('screen').width,
+    alignItems: "center",
+    justifyContent: "center",
+
+  }
 });
