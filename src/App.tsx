@@ -3,28 +3,24 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-import BusInformationView from "./Components/BusInformationView";
 import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
-import {Dimensions} from 'react-native';
+import { Dimensions } from 'react-native';
+import { NativeBaseProvider } from "native-base";
+import HomeView from "./Components/HomeView";
 
 function App() {
-  
+
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
-
-  // callbacks
-  const handleSheetChange = useCallback((index) => {
-    console.log("handleSheetChange", index);
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -42,22 +38,23 @@ function App() {
   return (
     <SafeAreaProvider>
       <ControllerProvider>
-        <View style={styles.container}>
-          <RTSMapView style={styles.map} />
-          <StatusBarBlurry />
-            <BottomSheet
-              ref={sheetRef}
-              index={1}
-              snapPoints={snapPoints}
-              onChange={handleSheetChange}
-              style={styles.container}>
-              <BottomSheetScrollView
-                horizontal = {false}
-                contentContainerStyle={styles.contentContainer}>
-                <BusInformationView />
-              </BottomSheetScrollView>
-            </BottomSheet>
-        </View>
+        <NativeBaseProvider>
+          <View style={styles.container}>
+            <RTSMapView style={styles.map} />
+            <StatusBarBlurry />
+              <BottomSheet
+                ref={sheetRef}
+                index={1}
+                snapPoints={snapPoints}
+                style={styles.container}>
+                <BottomSheetScrollView
+                  horizontal = {false}
+                  contentContainerStyle={styles.contentContainer}>
+                  <HomeView />
+                </BottomSheetScrollView>
+              </BottomSheet>
+          </View>
+        </NativeBaseProvider>
       </ControllerProvider>
     </SafeAreaProvider>
   );

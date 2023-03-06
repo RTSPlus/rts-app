@@ -1,282 +1,157 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { VStack, Box, Container, NativeBaseProvider, HStack } from 'native-base';
-import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { RTS_GOOGLE_API_KEY } from '@env';
-import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {Dimensions} from 'react-native';
+import React, { useEffect, useCallback, useRef, useMemo, useState } from "react";
+import { Text, Button, TouchableOpacity } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Dimensions } from 'react-native';
+import { colors } from "../colors";
+import { Container, HStack, VStack } from "native-base";
+import CustomBusIcon from "./CustomBusIcon";
+import { ScrollView } from "react-native-gesture-handler";
+
+const busses = [ 
+    // map color to number
+    "1",
+    "2",
+    "3",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10"
+  ];
 
 const BusInformationView = () => {
 
-  const snapPoints = useMemo(() => [800, 900], []);
-
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const handlePresentPress = () => bottomSheetModalRef.current.present();
-  const handleClosePress = () => bottomSheetModalRef.current.dismiss();
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
-  
-  const busClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const busInfoClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const moreClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const moreRoutesClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const locationClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  return (
-    <View style={styles.container} >
-
-      <NativeBaseProvider config={config} >
-
+    return(
+        <ScrollView>
+        <View style={styles.container}>
         <Container style={styles.container}>
+            <Text style={{alignItems:"center", justifyContent:"center", marginBottom:10}}>
+                Route Information
+            {/* Browse route schedules, selecting will not make changes to the map */}
+            </Text>
 
-          <Box borderX="1" borderRadius="md" >
-
-            <VStack space='2' alignItems="center">
-
-              {/* 
-                Google Places Autocomplete and Bus Information Button View
-              */}
-              <View style={styles.container}>
-
-                <HStack space='5' style={styles.container}>
-                  <ScrollView horizontal={true} >
-                    <GooglePlacesAutocomplete
-                      styles={{
-                        description: {
-                          color: 'grey',
-                          fontSize: 16,
-                        },
-                          predefinedPlacesDescription: {
-                          color: '#3caf50',
-                        },
-                      }}
-                        query={{key: RTS_GOOGLE_API_KEY}}
-                        keepResultsAfterBlur={true}
-                        enablePoweredByContainer={false}
-                        disableScroll={true}
-                        isRowScrollable={false}
-                        fetchDetails={true}
-                        minLength={2}
-                        placeholder="Type a place"
-                        listViewDisplayed='auto'
-                        onPress={(data, details = null) => 
-                          console.log(data, details)
-                        }/>
-                  </ScrollView>
-                  <TouchableOpacity style={{alignSelf:'flex-start'}}>
-                    <Icon name="bus" size={40} color="grey"/> 
+        <VStack space={5} alignItems="center">
+            <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#A8A4CE' text="1" />
                   </TouchableOpacity>
-                </HStack>
-              </View>
 
-              {/* 
-                Favorites container header and more button
-              */}
-              <HStack width="100%" space="75%">
-                <Text 
-                  style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  }}>
-                  favorites
-                </Text>
-                <TouchableOpacity>
-                  <Text 
-                  style={{
-                    justifyContent: 'flex-end',
-                    alignItems: 'flex-end',
-                    color:'grey'
-                  }}>
-                    more
-                  </Text>
-                </TouchableOpacity>
-              </HStack>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#D3EBCD' text="2" />
+                  </TouchableOpacity>
 
-              {/* 
-                Favorites information container
-              */}
-              <Box bg={{
-                linearGradient: {
-                  colors: ['#D7CECE', '#D7CECE'],
-                  start: [0, 0],
-                  end: [1, 0]
-                }
-                }} p="12" rounded="xl" _text={{
-                  fontSize: 'md',
-                  fontWeight: 'medium',
-                  color: 'warmGray.50',
-                  textAlign: 'center'
-                }}>
-                <HStack space={5} alignItems="center">
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                </HStack>
-              </Box>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#506D84' text="3" />
+                  </TouchableOpacity>
 
-              {/* 
-                Routes near you header and all routes button
-              */}
-              <HStack width="100%" space="50%">
-                <Text 
-                style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                  routes near you
-                </Text>
-                <TouchableOpacity onPress={handlePresentPress}>
-                  <Text 
-                  style={{
-                    justifyContent: 'flex-end',
-                    alignItems: 'flex-end',
-                    color:'grey'
-                  }}>
-                    all routes
-                  </Text>
-                </TouchableOpacity>
-              </HStack>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#B1BCE6' text="5" />
+                  </TouchableOpacity>
+            </HStack>
 
-              {/* 
-                Routes Information Container
-              */}
-              <Box width="100%" bg={{
-                linearGradient: {
-                  colors: ['#D7CECE', '#D7CECE'],
-                  start: [0, 0],
-                  end: [1, 0]
-                }
-                }} p="12" rounded="xl" _text={{
-                  fontSize: 'md',
-                  fontWeight: 'medium',
-                  color: 'warmGray.50',
-                  textAlign: 'center'
-                }}>
-                <HStack space={5} alignItems="center">
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={busClickedHandler}
-                        style={styles.roundButton1}>
-                        <Icon name="bus" size={45} color="white" />
-                    </TouchableOpacity>
-                </HStack>
-              </Box>
+            <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#F8A4CE' text="6" />
+                  </TouchableOpacity>
 
-              {/* 
-                Recents header
-              */}
-              <HStack width="100%">
-                <Text 
-                  style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  }}>
-                  recents
-                  </Text>
-              </HStack>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#506D84' text="7" />
+                  </TouchableOpacity>
 
-              {/* 
-                Recents Information Container
-              */}
-              <Box width="100%"  bg={{
-                linearGradient: {
-                  colors: ['#D7CECE', '#D7CECE'],
-                  start: [0, 0],
-                  end: [1, 0]
-                }
-                }} p="12" rounded="xl" _text={{
-                  fontSize: 'md',
-                  fontWeight: 'medium',
-                  color: 'warmGray.50',
-                  textAlign: 'center'
-                }}>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#AA132F' text="8" />
+                  </TouchableOpacity>
 
-              </Box>
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#F7E2E2' text="9" />
+                  </TouchableOpacity>
+            </HStack>
+
+            <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#34626C' text="10" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#CC7351' text="11" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#9BA17B' text="12" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#1A132F' text="13" />
+                  </TouchableOpacity>
+            </HStack>
+
+            <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#A7D2CB' text="15" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#506D84' text="16" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#65647C' text="17" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#CFB997' text="20" />
+                  </TouchableOpacity>
+            </HStack>
+            <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#4E6C50' text="21" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#D3EBCD' text="23" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#1A132F' text="25" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#FEFECC' text="26" />
+                  </TouchableOpacity>
+            </HStack>
+                        <HStack space={4} alignItems="center">
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#FF8364' text="28" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#A7D2CB' text="33" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#1A132F' text="34" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity>
+                    <CustomBusIcon color='#4E6C50' text="35" />
+                  </TouchableOpacity>
+            </HStack>
 
             </VStack>
-
-          </Box>
-
         </Container>
-
-      </NativeBaseProvider>
-    
-    </View>
-  );
-};
+        </View>
+        </ScrollView>
+    );
+}
 
 export default BusInformationView;
 
-const config = {
-  dependencies: {
-    'linear-gradient': LinearGradient
-  }
-};
-
 const styles = StyleSheet.create({
-  modal:{
-    width:Dimensions.get('screen').width,
-  },
-  subheading:{
-    flex:1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-  },
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  roundButton1: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 75,
-    height: 75,
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: 'grey',
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    elevation: 2,
-    shadowRadius: 15 ,
-    shadowOffset : { width: 1, height: 5},
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: "#fff",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  });
