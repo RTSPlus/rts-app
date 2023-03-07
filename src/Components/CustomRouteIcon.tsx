@@ -1,5 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Text, StyleSheet} from 'react-native';
 
 const CustomRouteIcon = ({color, text}: {color:string, text:string}) => {
 
@@ -25,15 +24,12 @@ const CustomRouteIcon = ({color, text}: {color:string, text:string}) => {
     style={styles.roundButton1}>
     <View style={{ alignItems: 'center' }}>
       <View style={{  alignItems: 'center'  }}>
-        {/* <Icon name="road" size={50} color='white'style={{ alignItems: 'center' }} /> */}
         <Text
           style={{
-            // position: 'absolute',
             alignItems: 'center' ,
             color: 'white',
             fontWeight: 'bold',
             fontSize: 35,
-            // marginTop: 5
           }}
         >
           {text}

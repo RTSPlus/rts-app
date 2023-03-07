@@ -11,6 +11,7 @@ import BusInformationView from './BusInformationView';
 import CustomBusIcon from './CustomBusIcon';
 import FavoritesView from './FavoritesView';
 import CustomRouteIcon from './CustomRouteIcon';
+import DetailedRouteView from './DetailedRouteView';
 
 const HomeView = () => {
 
@@ -19,6 +20,8 @@ const HomeView = () => {
   const [allRoutesViewVisible, setAllRoutesViewVisible] = useState(false);
   const [busInformationViewVisible, setBusInformationViewVisible] = useState(false);
   const [favoritesViewVisible, setFavoritesViewVisible] = useState(false);
+  const [detailedRouteViewVisible, setDetailedRouteViewVisible] = useState(false);
+  const [routeSelection, setRouteSelection] = useState('');
 
   const handleBusInformationViewToggle = () => {
     setBusInformationViewVisible(prevState => !prevState);
@@ -35,26 +38,9 @@ const HomeView = () => {
     setHomeViewVisible(prevState => !prevState);
   };
 
-  // callbacks
-  
-  const busClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const busInfoClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const moreClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const moreRoutesClickedHandler = () => {
-    console.log('You have been clicked a button!');
-  };
-
-  const locationClickedHandler = () => {
-    console.log('You have been clicked a button!');
+  const handleDetailedRouteViewToggle = () => {
+    setDetailedRouteViewVisible(prevState => !prevState);
+    setHomeViewVisible(prevState => !prevState);
   };
 
   return (
@@ -113,7 +99,7 @@ const HomeView = () => {
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
                   }}>
-                  favorites
+                  ✨ favorites
                 </Text>
                 <TouchableOpacity onPress={handleFavoritesViewToggle}>
                   <Text 
@@ -143,7 +129,7 @@ const HomeView = () => {
                   textAlign: 'center'
                 }}>
                 <HStack space={2} alignItems="center">
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleDetailedRouteViewToggle}>
                     <CustomBusIcon color='#A8A4CE' text="20" />
                   </TouchableOpacity>
 
@@ -163,13 +149,13 @@ const HomeView = () => {
               {/* 
                 Routes near you header and all routes button
               */}
-              <HStack width="90%" space="55%">
+              <HStack width="90%" space="45%">
                 <Text 
                 style={{
                   justifyContent: 'flex-start',
                   alignItems: 'flex-start',
                 }}>
-                  routes near you
+                  🚌 routes near you
                 </Text>
                 <TouchableOpacity onPress={handleAllRoutesViewToggle}>
                   <Text 
@@ -273,6 +259,23 @@ const HomeView = () => {
               </Text>
             </TouchableOpacity>
             <BusInformationView />
+          </View>
+        }
+
+        { detailedRouteViewVisible && 
+          <View>
+            <TouchableOpacity onPress={handleDetailedRouteViewToggle}>
+              <Text 
+                style={{
+                  color:'grey',
+                  width:Dimensions.get('screen').width - 15,
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                }}>
+                  go back
+              </Text>
+            </TouchableOpacity>
+            <DetailedRouteView route={routeSelection}/>
           </View>
         }
 

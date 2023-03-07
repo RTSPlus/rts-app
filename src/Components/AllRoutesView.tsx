@@ -1,8 +1,6 @@
-import React, { useEffect, useCallback, useRef, useMemo, useState } from "react";
+import React from "react";
 import { Text, Button } from "react-native";
 import { StyleSheet, View } from "react-native";
-import { Dimensions } from 'react-native';
-import { colors } from "../colors";
 import { Container } from "native-base";
 
 const AllRoutesView = () => {
@@ -11,7 +9,7 @@ const AllRoutesView = () => {
       <Container>
         <Text>
           All Routes
-          {/* Display routes browser to display selected routes on the map*/}
+          {/* Display routes browser to display different routes on the map and see the route predicted schedules*/}
         </Text>
       </Container>
     </View>
@@ -25,6 +23,5 @@ const styles = StyleSheet.create({
       backgroundColor: "#fff",
       alignItems: "center",
       justifyContent: "center",
-      // width:Dimensions.get('screen').width,
     },
   });
