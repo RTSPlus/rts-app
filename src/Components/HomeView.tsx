@@ -13,6 +13,25 @@ import FavoritesView from './FavoritesView';
 import CustomRouteIcon from './CustomRouteIcon';
 import DetailedRouteView from './DetailedRouteView';
 
+const axios = require('axios');
+
+// test
+const origin = {latitude: 29.721175, longitude: -82.363335};
+const destination = {latitude: 29.6481658, longitude: -82.3454982};
+
+async function getDirections(origin, destination) {
+  try {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${RTS_GOOGLE_API_KEY}`);
+    const data = await response.json();
+    // Here, 'data' is the parsed JSON object returned by the API
+    console.log(data);
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
 const HomeView = () => {
 
   // states

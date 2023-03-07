@@ -31,7 +31,7 @@ function App() {
       }
 
       const location = await Location.getCurrentPositionAsync({});
-      console.log(location);
+      // console.log(location);
     })();
   }, []);
 
