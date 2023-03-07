@@ -2,6 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
 import { ViewProps } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
+import { hasPresentKey } from "ts-is-present";
 
 import { useVehicleLocations } from "./useVehicleLocations";
 import { useAvailableRoutes } from "../controller/useAvailableRoutes";
