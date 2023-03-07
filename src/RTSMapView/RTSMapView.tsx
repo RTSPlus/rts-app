@@ -7,6 +7,13 @@ import { useVehicleLocations } from "./useVehicleLocations";
 import { useAvailableRoutes } from "../controller/useAvailableRoutes";
 import { getRoutePattern } from "../rts-api/rts";
 import { hasPresentKey } from "ts-is-present";
+import React from "react";
+import MapViewDirections from 'react-native-maps-directions';
+import { RTS_GOOGLE_API_KEY } from '@env';
+
+// test route
+const origin = {latitude: 29.721175, longitude: -82.363335};
+const destination = {latitude: 29.6481658, longitude: -82.3454982};
 
 // TODO testing only
 const bounds = {
@@ -47,7 +54,19 @@ export default function RTSMapView(props: ViewProps) {
   console.log(vehicleLocations);
 
   return (
-    <MapView {...props} initialRegion={initialRegion}>
+    <MapView {...props} 
+      initialRegion={initialRegion}
+      showsUserLocation={true}
+      followsUserLocation={true}
+      >
+        {/* <MapViewDirections
+          origin={origin}
+          destination={destination}
+          apikey={RTS_GOOGLE_API_KEY}
+          strokeWidth={3}
+          strokeColor="hotpink"
+          optimizeWaypoints={true}
+        /> */}
       {routePatterns.map((rt) => (
         <Polyline
           key={rt.num}
