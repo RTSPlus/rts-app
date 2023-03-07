@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Button } from 'react-native';
 import { VStack, Box, Container, NativeBaseProvider, HStack } from 'native-base';
 import { LinearGradient } from 'expo-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -12,35 +12,71 @@ import CustomBusIcon from './CustomBusIcon';
 import FavoritesView from './FavoritesView';
 import CustomRouteIcon from './CustomRouteIcon';
 import DetailedRouteView from './DetailedRouteView';
+import { FlatList } from 'react-native';
 
-const axios = require('axios');
-
-// test
-const origin = {latitude: 29.721175, longitude: -82.363335};
-const destination = {latitude: 29.6481658, longitude: -82.3454982};
-
-async function getDirections(origin, destination) {
-  try {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&key=${RTS_GOOGLE_API_KEY}`);
-    const data = await response.json();
-    // Here, 'data' is the parsed JSON object returned by the API
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error(error);
-    return null;
+const BusDirections = ({ directions }:{ directions:any }) => {
+  
+  if (!directions) {
+    return <Text>Loading directions...</Text>;
   }
-}
+
+  const renderItem = ({ item }: { item: any }) => {
+    if (item.travel_mode === 'TRANSIT') {
+      return (
+        <View style={styles.directionItem}>
+          <Text style={styles.directionText}>Take Bus {item.transit_details.line.short_name} {item.transit_details.headsign}</Text>
+          <Text style={styles.directionText}>Get off at {item.transit_details.arrival_stop.name}</Text>
+          <Text style={styles.directionText}>
+            {item.distance.text} ({item.duration.text})
+          </Text>
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.directionItem}>
+          <Text style={styles.directionText}>{item.html_instructions}</Text>
+          <Text style={styles.directionText}>
+            {item.distance.text} ({item.duration.text})
+          </Text>
+        </View>
+      );
+    }
+  };
+  
+  return (
+    <>
+    <FlatList
+      data={directions}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => index.toString()}
+    />
+    </>
+  );
+};
 
 const HomeView = () => {
 
   // states
+  const [displayDirections, toggleDisplayDirections] = useState(false);
+  const [directions, setDirections] = useState([]);
   const [homeViewVisible, setHomeViewVisible] = useState(true); // home view is initially true
   const [allRoutesViewVisible, setAllRoutesViewVisible] = useState(false);
   const [busInformationViewVisible, setBusInformationViewVisible] = useState(false);
   const [favoritesViewVisible, setFavoritesViewVisible] = useState(false);
   const [detailedRouteViewVisible, setDetailedRouteViewVisible] = useState(false);
   const [routeSelection, setRouteSelection] = useState('');
+  const [originAddress, setOriginAddress] = useState('');
+  const [destinationAddress, setDestinationAddress] = useState('');
+
+  const getDirections = async () => {
+    try {
+      const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${originAddress}&destination=${destinationAddress}&mode=transit&transit_mode=bus&key=${RTS_GOOGLE_API_KEY}`);
+      const data = await response.json();
+      setDirections(data?.routes[0]?.legs[0]?.steps);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleBusInformationViewToggle = () => {
     setBusInformationViewVisible(prevState => !prevState);
@@ -62,6 +98,11 @@ const HomeView = () => {
     setHomeViewVisible(prevState => !prevState);
   };
 
+  const handlDirectionsViewToggle = () => {
+    getDirections();
+    toggleDisplayDirections(prevState => !prevState);
+  };
+
   return (
     <View style={styles.container}>
 
@@ -77,14 +118,14 @@ const HomeView = () => {
                 Google Places Autocomplete and Bus Information Button View
               */}
               <View style={styles.container}>
-
                 <HStack space='5' style={styles.container}>
                   <ScrollView horizontal={true} >
+                  <VStack alignItems="flex-start">
                     <GooglePlacesAutocomplete
                       styles={{
                         description: {
                           color: 'black',
-                          fontSize: 16,
+                          fontSize: 15,
                         },
                           predefinedPlacesDescription: {
                           color: '#3caf50',
@@ -97,11 +138,41 @@ const HomeView = () => {
                         isRowScrollable={false}
                         fetchDetails={true}
                         minLength={2}
-                        placeholder="Type a place"
+                        placeholder="Start Location"
                         listViewDisplayed='auto'
-                        onPress={(data, details = null) => 
-                          console.log(data, details)
+                        onPress={(data, details) => {
+                            if (details) {
+                              setOriginAddress(details.formatted_address);
+                            }
+                          }
+                        }
+                    />
+                    <GooglePlacesAutocomplete
+                      styles={{
+                        description: {
+                          color: 'black',
+                          fontSize: 15,
+                        },
+                          predefinedPlacesDescription: {
+                          color: '#3caf50',
+                        },
+                      }}
+                        query={{key: RTS_GOOGLE_API_KEY}}
+                        keepResultsAfterBlur={true}
+                        enablePoweredByContainer={false}
+                        disableScroll={true}
+                        isRowScrollable={false}
+                        fetchDetails={true}
+                        minLength={2}
+                        placeholder="End Location"
+                        listViewDisplayed='auto'
+                        onPress={(data, details) => {
+                          if (details) {
+                            setDestinationAddress(details.formatted_address);
+                          }
+                        }
                         }/>
+                  </VStack>  
                   </ScrollView>
                   <TouchableOpacity onPress={handleBusInformationViewToggle} style={{alignSelf:'flex-start'}}>
                     <Icon name="map-o" size={35} color="black"/> 
@@ -109,6 +180,17 @@ const HomeView = () => {
                 </HStack>
               </View>
 
+                <View style={styles.container}>
+                <Button
+                  title={displayDirections ? "Hide Directions" : "Show Directions"}
+                  onPress={handlDirectionsViewToggle}
+                />
+                  {displayDirections&&
+                    <ScrollView horizontal={true}>
+                        <BusDirections directions={directions} />
+                    </ScrollView>
+                  } 
+                </View>
               {/* 
                 Favorites container header and more button
               */}
@@ -313,6 +395,11 @@ const config = {
 };
 
 const styles = StyleSheet.create({
+  directionsInput: {
+    flex:1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
   contentContainer: {
     flex: 1,
     alignItems: 'center',
@@ -340,5 +427,14 @@ const styles = StyleSheet.create({
     elevation: 2,
     shadowRadius: 15 ,
     shadowOffset : { width: 1, height: 5},
+  },
+  directionItem: {
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    paddingVertical: 10,
+  },
+  directionText: {
+    fontSize: 16,
+    marginBottom: 5,
   },
 });

@@ -9,7 +9,7 @@ const AllRoutesView = () => {
       <Container>
         <Text>
           All Routes
-          {/* Display routes browser to display different routes on the map and see the route predicted schedules*/}
+          {/* Display routes browser to display different routes on the map and see the route schedules*/}
         </Text>
       </Container>
     </View>
