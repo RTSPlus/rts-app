@@ -9,13 +9,14 @@ import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-
 import BusInformationView from "./Components/BusInformationView";
 import RTSMapView from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
+import {Dimensions} from 'react-native';
 
 function App() {
+  
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
@@ -44,20 +45,18 @@ function App() {
         <View style={styles.container}>
           <RTSMapView style={styles.map} />
           <StatusBarBlurry />
-          <BottomSheet
-            ref={sheetRef}
-            index={1}
-            snapPoints={snapPoints}
-            onChange={handleSheetChange}
-            style={styles.container}
-          >
-            <BottomSheetScrollView
-              horizontal = {true}
-              contentContainerStyle={styles.contentContainer}
-            >
-              <BusInformationView />
-            </BottomSheetScrollView>
-          </BottomSheet>
+            <BottomSheet
+              ref={sheetRef}
+              index={1}
+              snapPoints={snapPoints}
+              onChange={handleSheetChange}
+              style={styles.container}>
+              <BottomSheetScrollView
+                horizontal = {false}
+                contentContainerStyle={styles.contentContainer}>
+                <BusInformationView />
+              </BottomSheetScrollView>
+            </BottomSheet>
         </View>
       </ControllerProvider>
     </SafeAreaProvider>
@@ -103,9 +102,9 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   contentContainer: {
-    width:"95%",
+    width: Dimensions.get('screen').width,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
-  },
+
+  }
 });
