@@ -1,5 +1,9 @@
-import { View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, Text, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+// Bus and route icons display the same view
+// Display route/bus specific data (inbound x min away outbound x min away)
+// Bus/route selection on displays the selection on the map
 
 const CustomBusIcon = ({color, text}: {color:string, text:string}) => {
 

@@ -13,8 +13,6 @@ const FavoritesView = () => {
           Favorites
           {/* Display bus browser, be able to select more favorite busses or just display busses and be able to favorite */}
         </Text>
-
-
       </Container>
     </View>
   );
@@ -29,4 +27,4 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "center",
     },
-  });
+});
