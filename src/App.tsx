@@ -49,10 +49,15 @@ function App() {
           <View style={styles.container}>
             <RTSMapView style={styles.map} />
             <StatusBarBlurry />
-            <BottomSheet ref={sheetRef} index={1} snapPoints={snapPoints}>
+            <BottomSheet
+              ref={sheetRef}
+              index={1}
+              snapPoints={snapPoints}
+              style={styles.bottomSheetContainer}
+            >
               <BottomSheetScrollView
                 horizontal={false}
-                contentContainerStyle={styles.contentContainer}
+                contentContainerStyle={styles.bottomSheetContent}
               >
                 <HomeView />
               </BottomSheetScrollView>
@@ -102,8 +107,19 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  contentContainer: {
-    width: Dimensions.get("screen").width,
+  bottomSheetContainer: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
+  bottomSheetContent: {
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },
