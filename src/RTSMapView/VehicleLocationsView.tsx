@@ -29,22 +29,23 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
     .map((e) => e.data);
 
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
-  console.log(vehicleLocations);
 
   return (
     <>
-      {routePatterns.map((rt) => (
-        <Polyline
-          key={rt.num}
-          coordinates={Object.values(rt.path)[0].path.map((pt) => ({
-            latitude: pt.lat,
-            longitude: pt.lon,
-          }))}
-          strokeColor={rt.color}
-          strokeColors={[rt.color]}
-          strokeWidth={3}
-        />
-      ))}
+      {routePatterns.flatMap((rt) =>
+        Object.values(rt.path).map(({ path }) => (
+          <Polyline
+            key={rt.num}
+            coordinates={path.map((pt) => ({
+              latitude: pt.lat,
+              longitude: pt.lon,
+            }))}
+            strokeColor={rt.color}
+            strokeColors={[rt.color]}
+            strokeWidth={3}
+          />
+        ))
+      )}
       {vehicleLocations
         .flatMap((e) => e.data ?? [])
         .map((e) => (
