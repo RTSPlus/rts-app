@@ -3,25 +3,27 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
+import { NativeBaseProvider } from "native-base";
 import React, { useEffect, useRef, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-import RTSMapView from "./RTSMapView/RTSMapView";
+
+import HomeView from "./Components/HomeView";
+import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
-import { Dimensions } from 'react-native';
-import { NativeBaseProvider } from "native-base";
-import HomeView from "./Components/HomeView";
 
 function App() {
-
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
 
+  const setMapState = useMapStateStore((state) => state.setMode);
+
+  // Location permissions effect
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -35,6 +37,11 @@ function App() {
     })();
   }, []);
 
+  // Set RTSMapView to non-empty on mount
+  useEffect(() => {
+    setMapState({ mode: "SHOWING_ROUTES", routeNumbers: [5, 20] });
+  }, []);
+
   return (
     <SafeAreaProvider>
       <ControllerProvider>
@@ -42,17 +49,19 @@ function App() {
           <View style={styles.container}>
             <RTSMapView style={styles.map} />
             <StatusBarBlurry />
-              <BottomSheet
-                ref={sheetRef}
-                index={1}
-                snapPoints={snapPoints}
-                style={styles.container}>
-                <BottomSheetScrollView
-                  horizontal = {false}
-                  contentContainerStyle={styles.contentContainer}>
-                  <HomeView />
-                </BottomSheetScrollView>
-              </BottomSheet>
+            <BottomSheet
+              ref={sheetRef}
+              index={1}
+              snapPoints={snapPoints}
+              style={styles.container}
+            >
+              <BottomSheetScrollView
+                horizontal={false}
+                contentContainerStyle={styles.contentContainer}
+              >
+                <HomeView />
+              </BottomSheetScrollView>
+            </BottomSheet>
           </View>
         </NativeBaseProvider>
       </ControllerProvider>
@@ -67,7 +76,7 @@ function StatusBarBlurry() {
       <StatusBar style="dark" />
       <SafeAreaInsetsContext.Consumer>
         {(insets) => (
-          <BlurView style={{ ...styles.statusBar, height: insets.top }} />
+          <BlurView style={{ ...styles.statusBar, height: insets?.top ?? 0 }} />
         )}
       </SafeAreaInsetsContext.Consumer>
     </>
@@ -99,9 +108,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   contentContainer: {
-    width: Dimensions.get('screen').width,
+    width: Dimensions.get("screen").width,
     alignItems: "center",
     justifyContent: "center",
-
-  }
+  },
 });
