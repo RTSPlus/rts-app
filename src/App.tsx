@@ -49,12 +49,7 @@ function App() {
           <View style={styles.container}>
             <RTSMapView style={styles.map} />
             <StatusBarBlurry />
-            <BottomSheet
-              ref={sheetRef}
-              index={1}
-              snapPoints={snapPoints}
-              style={styles.container}
-            >
+            <BottomSheet ref={sheetRef} index={1} snapPoints={snapPoints}>
               <BottomSheetScrollView
                 horizontal={false}
                 contentContainerStyle={styles.contentContainer}
@@ -86,7 +81,7 @@ function StatusBarBlurry() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },
