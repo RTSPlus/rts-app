@@ -54,6 +54,9 @@ function App() {
               index={1}
               snapPoints={snapPoints}
               style={styles.bottomSheetContainer}
+              handleIndicatorStyle={{
+                backgroundColor: colors.ios.light.gray["2"].toRgbString(),
+              }}
             >
               <BottomSheetScrollView
                 horizontal={false}
