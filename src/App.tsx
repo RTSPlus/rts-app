@@ -1,10 +1,14 @@
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetScrollView,
+  useBottomSheetSpringConfigs,
+} from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef, useMemo, useCallback } from "react";
 import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
@@ -23,7 +27,7 @@ LogBox.ignoreLogs([
 function App() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
+  const snapPoints = ["15%", "50%", "90%"];
 
   const setMapState = useMapStateStore((state) => state.setMode);
 
@@ -46,6 +50,29 @@ function App() {
     setMapState({ mode: "SHOWING_ROUTES", routeNumbers: [5, 20] });
   }, []);
 
+  // Spring animation config
+
+  const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const backdropComponent = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={2}
+        disappearsOnIndex={1}
+        opacity={0.2}
+        pressBehavior={() => {}}
+      />
+    ),
+    []
+  );
+
   return (
     <SafeAreaProvider>
       <ControllerProvider>
@@ -61,6 +88,9 @@ function App() {
               handleIndicatorStyle={{
                 backgroundColor: colors.ios.light.gray["2"].toRgbString(),
               }}
+              animationConfigs={bottomSheetAnimationConfigs}
+              backdropComponent={backdropComponent}
+              enablePanDownToClose={false}
             >
               <BottomSheetScrollView
                 horizontal={false}
