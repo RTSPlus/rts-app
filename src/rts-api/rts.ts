@@ -3,7 +3,7 @@ import encHex from "crypto-js/enc-hex";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 import { distVincenty } from "node-vincenty";
 
-import { PathPoint, PathStopPoint, Route, RoutePath } from "./types";
+import { PathPoint, PathStopPoint, Route, Pattern } from "./types";
 
 // Veryify that the environment variables are set
 if (!RTS_HASH_KEY || !RTS_API_KEY) {
@@ -119,7 +119,7 @@ export async function getRoutePattern(
       .then((data) => {
         const pathResponse = data["bustime-response"]["ptr"];
 
-        const paths: RoutePath[] = pathResponse.map((path: any) => {
+        const paths: Pattern[] = pathResponse.map((path: any) => {
           path["pt"].sort(
             (a: { [x: string]: number }, b: { [x: string]: number }) =>
               a["seq"] - b["seq"]
@@ -189,7 +189,7 @@ export async function getRoutePattern(
             direction: path["rtdir"],
             path: points,
             stops,
-          } as RoutePath;
+          } as Pattern;
         });
 
         // TODO: get the route name and color
@@ -197,7 +197,7 @@ export async function getRoutePattern(
           num: rt,
           name,
           color,
-          path: paths.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {}),
+          patterns: paths.reduce((acc, cur) => ({ ...acc, [cur.id]: cur }), {}),
         };
 
         res(route);

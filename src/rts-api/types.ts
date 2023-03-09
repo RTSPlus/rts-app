@@ -17,7 +17,7 @@ export type PathStopPoint = PathPoint & {
   reportedDistance: number;
 };
 
-export type RoutePath = {
+export type Pattern = {
   id: number;
   reportedLength: number;
   direction: "INBOUND" | "OUTBOUND";
@@ -36,5 +36,5 @@ export type Route = {
   num: number;
   name: string;
   color: string;
-  path: Record<number, RoutePath>;
+  patterns: Record<number, Pattern>;
 };
