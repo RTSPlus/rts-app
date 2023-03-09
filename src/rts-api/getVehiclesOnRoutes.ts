@@ -28,7 +28,9 @@ export default async function getVehiclesOnRoute(routeNum: number) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const parsed = Schema.safeParse(data["bustime-response"]["vehicle"]);
+        const parsed = Schema.safeParse(
+          data["bustime-response"]["vehicle"] ?? []
+        );
 
         if (!parsed.success) {
           rej(parsed.error);
