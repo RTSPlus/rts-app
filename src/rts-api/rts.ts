@@ -2,6 +2,7 @@ import { RTS_HASH_KEY, RTS_API_KEY } from "@env";
 import encHex from "crypto-js/enc-hex";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 import { distVincenty } from "node-vincenty";
+import { bisect_left } from "../utils";
 
 import { PathPoint, PathStopPoint, Route, Pattern } from "./types";
 
@@ -106,6 +107,13 @@ export async function getRoutes() {
 }
 
 const PROJECTED_DISTANCE_SCALING_FACTOR = 0.98;
+/**
+ * Ensures PathPoint[] is sorted
+ * @param rt
+ * @param name
+ * @param color
+ * @returns
+ */
 export async function getRoutePattern(
   rt: number,
   name: string,
@@ -135,6 +143,10 @@ export async function getRoutePattern(
 
               if (points.length > 0) {
                 const lastPoint = points.at(-1);
+                if (lastPoint === undefined) {
+                  throw new Error("lastPoint is undefined");
+                }
+
                 const distanceDiff = distVincenty(
                   lastPoint.lat,
                   lastPoint.lon,
@@ -148,6 +160,7 @@ export async function getRoutePattern(
               }
 
               points.push({
+                seq: parseInt(point["seq"], 10),
                 lat: parseFloat(point["lat"]),
                 lon: parseFloat(point["lon"]),
                 type: point["typ"],
@@ -156,13 +169,13 @@ export async function getRoutePattern(
               });
             } else if (point["typ"] === "S") {
               stops.push({
+                seq: parseInt(point["seq"], 10),
                 lat: parseFloat(point["lat"]),
                 lon: parseFloat(point["lon"]),
                 name: point["stpnm"],
                 id: point["stpid"],
                 type: point["typ"],
-                projectedDistance:
-                  points.length > 0 ? points.at(-1).projectedDistance : 0,
+                projectedDistance: points.at(-1)?.projectedDistance ?? 0,
                 reportedDistance: parseFloat(point["pdist"]),
                 interpolated: false,
               });
@@ -182,6 +195,10 @@ export async function getRoutePattern(
               stops.pop();
             }
           }
+
+          // Sort points and stops by by seq
+          points.sort((a, b) => a.seq - b.seq);
+          stops.sort((a, b) => a.seq - b.seq);
 
           return {
             id: path["pid"],
@@ -204,4 +221,59 @@ export async function getRoutePattern(
       })
       .catch((err) => rej(err));
   });
+}
+
+// TODO: Implement
+export function projectPdistToNearestStop() {
+  throw new Error("Not implemented");
+}
+
+/**
+ * Expects a sorted `PathPoint[]`
+ * Expects pdist in meters
+ */
+export function projectPdistToPathPoint(
+  path: PathPoint[],
+  pdist: number
+): PathPoint {
+  if (path.length === 0) {
+    throw new Error("Path is empty");
+  }
+
+  // Clip pdist to path length
+  if (pdist >= path.at(-1)!.projectedDistance) {
+    return path.at(-1)!;
+  } else if (pdist <= 0) {
+    return path.at(0)!;
+  }
+
+  const index = bisect_left(path, pdist, (p) => p.projectedDistance);
+
+  // Handle edge cases where pdist is exactly on a point
+  // Just because I don't want to deal with projection edge cases
+  if (index === 0) {
+    return path.at(0)!;
+  } else if (index === path.length) {
+    return path.at(-1)!;
+  } else if (path.at(index)?.projectedDistance === pdist) {
+    return path.at(index)!;
+  }
+
+  const prevPoint = path.at(index - 1)!;
+  const nextPoint = path.at(index)!;
+
+  const ratio =
+    (pdist - prevPoint.projectedDistance) /
+    (nextPoint.projectedDistance - prevPoint.projectedDistance);
+  const lat = prevPoint.lat + ratio * (nextPoint.lat - prevPoint.lat);
+  const lon = prevPoint.lon + ratio * (nextPoint.lon - prevPoint.lon);
+
+  return {
+    seq: -1,
+    lat,
+    lon,
+    type: "W",
+    projectedDistance: pdist,
+    interpolated: true,
+  };
 }

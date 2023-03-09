@@ -1,4 +1,6 @@
 export type PathPoint = {
+  seq: number;
+
   lat: number;
   lon: number;
 
