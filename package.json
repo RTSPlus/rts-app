@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "expo start",
     "start": "expo start",
+    "dev-clear-cache": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
