@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
 import React, { useEffect, useRef, useMemo } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
@@ -15,6 +15,10 @@ import HomeView from "./Components/HomeView";
 import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
+
+LogBox.ignoreLogs([
+  "setNativeProps is deprecated and will be removed in next major release",
+]);
 
 function App() {
   // hooks
