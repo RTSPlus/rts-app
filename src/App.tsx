@@ -8,14 +8,21 @@ import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
-import React, { useEffect, useRef, useMemo, useCallback } from "react";
-import { LogBox, StyleSheet, View } from "react-native";
+import React, {
+  useEffect,
+  useRef,
+  useCallback,
+  ComponentProps,
+  PropsWithChildren,
+} from "react";
+import { LogBox, StyleSheet, View, Text } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
 import HomeView from "./Components/HomeView";
+import HomeView2 from "./Components/HomeView2";
 import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
@@ -24,10 +31,20 @@ LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
 ]);
 
+const Providers = (props: PropsWithChildren) => {
+  return (
+    <SafeAreaProvider>
+      <ControllerProvider>
+        <NativeBaseProvider>{props.children}</NativeBaseProvider>
+      </ControllerProvider>
+    </SafeAreaProvider>
+  );
+};
+
 function App() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["15%", "50%", "90%"];
+  const snapPoints = ["15%", "50%", "92%"];
 
   const setMapState = useMapStateStore((state) => state.setMode);
 
@@ -51,7 +68,6 @@ function App() {
   }, []);
 
   // Spring animation config
-
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
     damping: 80,
     overshootClamping: true,
@@ -61,48 +77,45 @@ function App() {
   });
 
   const backdropComponent = useCallback(
-    (props) => (
+    (props: ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop
         {...props}
         appearsOnIndex={2}
         disappearsOnIndex={1}
         opacity={0.2}
-        pressBehavior={() => {}}
+        pressBehavior="none"
       />
     ),
     []
   );
 
   return (
-    <SafeAreaProvider>
-      <ControllerProvider>
-        <NativeBaseProvider>
-          <View style={styles.container}>
-            <RTSMapView style={styles.map} />
-            <StatusBarBlurry />
-            <BottomSheet
-              ref={sheetRef}
-              index={1}
-              snapPoints={snapPoints}
-              style={styles.bottomSheetContainer}
-              handleIndicatorStyle={{
-                backgroundColor: colors.ios.light.gray["2"].toRgbString(),
-              }}
-              animationConfigs={bottomSheetAnimationConfigs}
-              backdropComponent={backdropComponent}
-              enablePanDownToClose={false}
-            >
-              <BottomSheetScrollView
-                horizontal={false}
-                contentContainerStyle={styles.bottomSheetContent}
-              >
-                <HomeView />
-              </BottomSheetScrollView>
-            </BottomSheet>
-          </View>
-        </NativeBaseProvider>
-      </ControllerProvider>
-    </SafeAreaProvider>
+    <Providers>
+      <View style={styles.container}>
+        <RTSMapView style={styles.map} />
+        <StatusBarBlurry />
+        <BottomSheet
+          ref={sheetRef}
+          index={1}
+          snapPoints={snapPoints}
+          style={styles.bottomSheetContainer}
+          handleIndicatorStyle={{
+            backgroundColor: colors.ios.light.gray["2"].toRgbString(),
+          }}
+          animationConfigs={bottomSheetAnimationConfigs}
+          backdropComponent={backdropComponent}
+          enablePanDownToClose={false}
+        >
+          <Text>Header</Text>
+          <BottomSheetScrollView
+            horizontal={false}
+            contentContainerStyle={styles.bottomSheetContent}
+          >
+            <HomeView2 />
+          </BottomSheetScrollView>
+        </BottomSheet>
+      </View>
+    </Providers>
   );
 }
 registerRootComponent(App);
