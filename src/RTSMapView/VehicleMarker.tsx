@@ -30,7 +30,6 @@ const VehicleMarker = forwardRef<VehicleMarkerRef, VehicleMarkerProps>(
       () => ({
         setInitialPdist: (newPdist) => {
           pdist.value = newPdist;
-          console.log(props.title, "setting initial pdist", newPdist);
         },
         animatedPdist: (newPdist, duration) => {
           pdist.value = withTiming(newPdist, { duration });
@@ -42,14 +41,13 @@ const VehicleMarker = forwardRef<VehicleMarkerRef, VehicleMarkerProps>(
     useAnimatedReaction(
       () => pdist.value,
       (newPdist) => {
-        const newCoords = projectPdistToPathPoint(props.path, newPdist);
-
-        internalMarkerRef.current?.setNativeProps({
-          coordinate: {
-            latitude: newCoords.lat,
-            longitude: newCoords.lon,
-          },
-        });
+        // const newCoords = projectPdistToPathPoint(props.path, newPdist);
+        // internalMarkerRef.current?.setNativeProps({
+        //   coordinate: {
+        //     latitude: newCoords.lat,
+        //     longitude: newCoords.lon,
+        //   },
+        // });
       },
       [pdist.value]
     );
