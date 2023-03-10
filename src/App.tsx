@@ -20,12 +20,10 @@ import {
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
-import HomeView from "./Components/HomeView";
 import HomeView2 from "./Components/HomeView2";
 import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
-import { match } from "ts-pattern";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
@@ -40,12 +38,6 @@ const Providers = (props: PropsWithChildren) => {
     </SafeAreaProvider>
   );
 };
-
-export type SheetCommands =
-  | {
-      command: "expand";
-    }
-  | { command: "snapToIndex"; index: number };
 
 function App() {
   // hooks
@@ -95,17 +87,6 @@ function App() {
     []
   );
 
-  const sheetCallback = useCallback((command: SheetCommands) => {
-    console.log("Sheet callback", command);
-
-    match(command)
-      .with({ command: "expand" }, () => sheetRef.current?.expand())
-      .with({ command: "snapToIndex" }, ({ index }) =>
-        sheetRef.current?.snapToIndex(index)
-      )
-      .exhaustive();
-  }, []);
-
   return (
     <Providers>
       <View style={styles.container}>
@@ -123,7 +104,7 @@ function App() {
           backdropComponent={backdropComponent}
           enablePanDownToClose={false}
         >
-          <HomeView2 sheetDispatch={sheetCallback} />
+          <HomeView2 sheetRef={sheetRef} />
         </BottomSheet>
       </View>
     </Providers>
