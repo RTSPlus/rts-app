@@ -24,6 +24,7 @@ import HomeView2 from "./Components/HomeView2";
 import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
+import HomeView from "./Components/HomeView";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
@@ -104,7 +105,8 @@ function App() {
           backdropComponent={backdropComponent}
           enablePanDownToClose={false}
         >
-          <HomeView2 sheetRef={sheetRef} />
+          <HomeView />
+          {/* <HomeView2 sheetRef={sheetRef} /> */}
         </BottomSheet>
       </View>
     </Providers>

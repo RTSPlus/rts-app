@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BottomSheetView } from "@gorhom/bottom-sheet";
-import { useCallback, useRef, useState } from "react";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   TextInput,
@@ -10,22 +10,22 @@ import {
 } from "react-native";
 import { match } from "ts-pattern";
 
-import { SheetCommands } from "../App";
 import { colors } from "../colors";
 
 type Props = {
-  sheetDispatch: (command: SheetCommands) => void;
+  sheetRef: RefObject<BottomSheet>;
+  sheetState: any;
 };
 
-export default function HomeView2({ sheetDispatch }: Props) {
+export default function HomeView2({ sheetRef, sheetState }: Props) {
   const searchInputRef = useRef<TextInput>(null);
 
   const [searchFocused, setSearchFocused] = useState(false);
 
   const onFocus = useCallback(() => {
-    sheetDispatch({ command: "expand" });
+    sheetRef.current?.expand();
     setSearchFocused(true);
-  }, [sheetDispatch, setSearchFocused]);
+  }, [sheetRef]);
 
   const onBlur = useCallback(() => {
     setSearchFocused(false);
@@ -33,8 +33,8 @@ export default function HomeView2({ sheetDispatch }: Props) {
 
   const onCancelPress = useCallback(() => {
     searchInputRef.current?.blur();
-    sheetDispatch({ command: "snapToIndex", index: 1 });
-  }, []);
+    sheetRef.current?.snapToIndex(1);
+  }, [sheetRef]);
 
   return (
     <BottomSheetView style={styles.container}>
