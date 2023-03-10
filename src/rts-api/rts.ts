@@ -2,9 +2,9 @@ import { RTS_HASH_KEY, RTS_API_KEY } from "@env";
 import encHex from "crypto-js/enc-hex";
 import hmacSHA256 from "crypto-js/hmac-sha256";
 import { distVincenty } from "node-vincenty";
-import { bisect_left } from "../utils";
 
 import { PathPoint, PathStopPoint, Route, Pattern } from "./types";
+import { bisect_left } from "../utils";
 
 // Veryify that the environment variables are set
 if (!RTS_HASH_KEY || !RTS_API_KEY) {
