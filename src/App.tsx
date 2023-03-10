@@ -1,6 +1,5 @@
 import BottomSheet, {
   BottomSheetBackdrop,
-  BottomSheetScrollView,
   useBottomSheetSpringConfigs,
 } from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
@@ -15,7 +14,7 @@ import React, {
   ComponentProps,
   PropsWithChildren,
 } from "react";
-import { LogBox, StyleSheet, View, Text } from "react-native";
+import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
@@ -26,6 +25,7 @@ import HomeView2 from "./Components/HomeView2";
 import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
+import { match } from "ts-pattern";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
@@ -41,10 +41,16 @@ const Providers = (props: PropsWithChildren) => {
   );
 };
 
+export type SheetCommands =
+  | {
+      command: "expand";
+    }
+  | { command: "snapToIndex"; index: number };
+
 function App() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["15%", "50%", "92%"];
+  const snapPoints = ["12.5%", "50%", "92%"];
 
   const setMapState = useMapStateStore((state) => state.setMode);
 
@@ -64,8 +70,8 @@ function App() {
 
   // Set RTSMapView to non-empty on mount
   useEffect(() => {
-    setMapState({ mode: "SHOWING_ROUTES", routeNumbers: [5, 20] });
-  }, []);
+    setMapState({ mode: "SHOWING_ROUTES", routeNumbers: [20] });
+  }, [setMapState]);
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
@@ -89,6 +95,17 @@ function App() {
     []
   );
 
+  const sheetCallback = useCallback((command: SheetCommands) => {
+    console.log("Sheet callback", command);
+
+    match(command)
+      .with({ command: "expand" }, () => sheetRef.current?.expand())
+      .with({ command: "snapToIndex" }, ({ index }) =>
+        sheetRef.current?.snapToIndex(index)
+      )
+      .exhaustive();
+  }, []);
+
   return (
     <Providers>
       <View style={styles.container}>
@@ -106,19 +123,12 @@ function App() {
           backdropComponent={backdropComponent}
           enablePanDownToClose={false}
         >
-          <Text>Header</Text>
-          <BottomSheetScrollView
-            horizontal={false}
-            contentContainerStyle={styles.bottomSheetContent}
-          >
-            <HomeView2 />
-          </BottomSheetScrollView>
+          <HomeView2 sheetDispatch={sheetCallback} />
         </BottomSheet>
       </View>
     </Providers>
   );
 }
-registerRootComponent(App);
 
 function StatusBarBlurry() {
   return (
@@ -174,3 +184,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+registerRootComponent(App);

@@ -1,10 +1,41 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
+import { match } from "ts-pattern";
 
+import { SheetCommands } from "../App";
 import { colors } from "../colors";
 
-export default function HomeView2() {
+type Props = {
+  sheetDispatch: (command: SheetCommands) => void;
+};
+
+export default function HomeView2({ sheetDispatch }: Props) {
+  const searchInputRef = useRef<TextInput>(null);
+
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  const onFocus = useCallback(() => {
+    sheetDispatch({ command: "expand" });
+    setSearchFocused(true);
+  }, [sheetDispatch, setSearchFocused]);
+
+  const onBlur = useCallback(() => {
+    setSearchFocused(false);
+  }, []);
+
+  const onCancelPress = useCallback(() => {
+    searchInputRef.current?.blur();
+    sheetDispatch({ command: "snapToIndex", index: 1 });
+  }, []);
+
   return (
     <BottomSheetView style={styles.container}>
       <BottomSheetView style={styles.searchRowContainer}>
@@ -16,19 +47,43 @@ export default function HomeView2() {
             color={colors.ios.light.gray["1"].toRgbString()}
           />
           <TextInput
+            ref={searchInputRef}
             style={styles.searchBarInput}
             placeholder="Search stops, routes, and places"
             placeholderTextColor={colors.ios.light.gray["1"].toRgbString()}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
         </BottomSheetView>
-        <View
-          style={{
-            width: 32,
-            height: 32,
-            backgroundColor: "red",
-            marginLeft: 16,
-          }}
-        />
+        {match(searchFocused)
+          .with(true, () => (
+            <TouchableOpacity
+              style={{
+                marginLeft: 16,
+              }}
+              onPress={onCancelPress}
+            >
+              <Text
+                style={{
+                  color: colors.ios.light.blue.toRgbString(),
+                  fontSize: 18,
+                }}
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          ))
+          .with(false, () => (
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                backgroundColor: "red",
+                marginLeft: 16,
+              }}
+            />
+          ))
+          .exhaustive()}
       </BottomSheetView>
     </BottomSheetView>
   );
@@ -41,6 +96,7 @@ const styles = StyleSheet.create({
   },
   searchRowContainer: {
     flexDirection: "row",
+    alignItems: "center",
     width: "100%",
   },
   searchBarContainer: {
