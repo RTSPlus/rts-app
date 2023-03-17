@@ -6,8 +6,8 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { projectPdistToPathPoint } from "../rts-api/rts";
-import { PathPoint } from "../rts-api/types";
+import { projectPdistToPathPoint } from "../../rts-api/rts";
+import { PathPoint } from "../../rts-api/types";
 
 export type VehicleMarkerProps = { path: PathPoint[] } & Omit<
   MapMarkerProps,

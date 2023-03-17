@@ -1,7 +1,7 @@
 import { useQueries } from "@tanstack/react-query";
 
-import getVehiclesOnRoute from "../rts-api/getVehiclesOnRoutes";
-import { RouteData } from "../rts-api/rts";
+import getVehiclesOnRoute from "../../rts-api/getVehiclesOnRoutes";
+import { RouteData } from "../../rts-api/rts";
 
 export function useVehicleLocations(routes: RouteData[]) {
   return useQueries({

@@ -20,11 +20,13 @@ import {
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
-import HomeView2 from "./Components/HomeView2";
-import RTSMapView, { useMapStateStore } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
+import HomeView from "./components/HomeView";
+import HomeView2 from "./components/HomeView2";
+import RTSMapView, {
+  useMapStateStore,
+} from "./components/RTSMapView/RTSMapView";
 import { ControllerProvider } from "./controller/Controller";
-import HomeView from "./Components/HomeView";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
