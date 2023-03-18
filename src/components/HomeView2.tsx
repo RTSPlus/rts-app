@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { useAtomValue, useSetAtom } from "jotai";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
@@ -10,22 +11,20 @@ import {
 } from "react-native";
 import { match } from "ts-pattern";
 
+import { sheetIndexAtom } from "./RTSBottomSheet/RTSBottomSheet";
 import { colors } from "../colors";
 
-type Props = {
-  sheetRef: RefObject<BottomSheet>;
-  sheetState: any;
-};
-
-export default function HomeView2({ sheetRef, sheetState }: Props) {
+export default function HomeView2() {
   const searchInputRef = useRef<TextInput>(null);
 
   const [searchFocused, setSearchFocused] = useState(false);
 
+  const setSheetIndex = useSetAtom(sheetIndexAtom);
+
   const onFocus = useCallback(() => {
-    sheetRef.current?.expand();
+    setSheetIndex(2);
     setSearchFocused(true);
-  }, [sheetRef]);
+  }, [setSheetIndex]);
 
   const onBlur = useCallback(() => {
     setSearchFocused(false);
@@ -33,8 +32,8 @@ export default function HomeView2({ sheetRef, sheetState }: Props) {
 
   const onCancelPress = useCallback(() => {
     searchInputRef.current?.blur();
-    sheetRef.current?.snapToIndex(1);
-  }, [sheetRef]);
+    setSheetIndex(1);
+  }, [setSheetIndex]);
 
   return (
     <BottomSheetView style={styles.container}>

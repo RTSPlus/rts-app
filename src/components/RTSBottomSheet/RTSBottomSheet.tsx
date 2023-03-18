@@ -2,17 +2,21 @@ import BottomSheet, {
   BottomSheetBackdrop,
   useBottomSheetSpringConfigs,
 } from "@gorhom/bottom-sheet";
-import { ComponentProps, useCallback, useRef, useState } from "react";
+import { atom, useAtomValue } from "jotai";
+import { ComponentProps, useCallback, useRef } from "react";
 import { StyleSheet } from "react-native";
 
 import { colors } from "../../colors";
 import HomeView2 from "../HomeView2";
 
+export const sheetIndexAtom = atom(1);
+
 export default function RTSBottomSheet() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
-  const [bottomSheetIndex, setBottomSheetIndex] = useState(1);
+
+  const bottomSheetIndex = useAtomValue(sheetIndexAtom);
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
@@ -48,10 +52,10 @@ export default function RTSBottomSheet() {
       animationConfigs={bottomSheetAnimationConfigs}
       backdropComponent={backdropComponent}
       enablePanDownToClose={false}
-      onChange={(index) => setBottomSheetIndex(index)}
+      // onChange={(index) => setBottomSheetIndex(index)}
     >
       {/* <HomeView /> */}
-      <HomeView2 sheetRef={sheetRef} />
+      <HomeView2 />
     </BottomSheet>
   );
 }
