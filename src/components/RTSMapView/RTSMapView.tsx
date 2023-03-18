@@ -1,9 +1,9 @@
 import { RTS_GOOGLE_API_KEY } from "@env";
+import { atom, useAtomValue } from "jotai";
 import { ViewProps } from "react-native";
 import MapView from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { match } from "ts-pattern";
-import { create } from "zustand";
 
 import VehicleLocationsView from "./VehicleLocationsView";
 
@@ -36,18 +36,10 @@ type RTSMapViewModes =
       destination: { lat: number; lon: number };
     };
 
-type RTSMapViewStateStore = {
-  mode: RTSMapViewModes;
-  setMode: (mode: RTSMapViewModes) => void;
-};
-
-export const useMapStateStore = create<RTSMapViewStateStore>((set) => ({
-  mode: { mode: "EMPTY" },
-  setMode: (newState: RTSMapViewModes) => set(() => ({ mode: newState })),
-}));
+export const mapModeAtom = atom<RTSMapViewModes>({ mode: "EMPTY" });
 
 export default function RTSMapView(props: ViewProps) {
-  const mapStore = useMapStateStore();
+  const mode = useAtomValue(mapModeAtom);
 
   return (
     <MapView
@@ -56,7 +48,7 @@ export default function RTSMapView(props: ViewProps) {
       showsUserLocation
       followsUserLocation
     >
-      {match(mapStore.mode)
+      {match(mode)
         .with({ mode: "EMPTY" }, () => <></>)
         .with({ mode: "SHOWING_ROUTES" }, (state) => (
           <VehicleLocationsView selectedRoutes={state.routeNumbers} />

@@ -6,6 +6,7 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
+import { useSetAtom } from "jotai";
 import { NativeBaseProvider } from "native-base";
 import React, {
   useEffect,
@@ -23,9 +24,7 @@ import {
 import { colors } from "./colors";
 import HomeView from "./components/HomeView";
 import HomeView2 from "./components/HomeView2";
-import RTSMapView, {
-  useMapStateStore,
-} from "./components/RTSMapView/RTSMapView";
+import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
 import { ControllerProvider } from "./controller/Controller";
 
 LogBox.ignoreLogs([
@@ -47,7 +46,7 @@ function App() {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
 
-  const setMapState = useMapStateStore((state) => state.setMode);
+  const setMapMode = useSetAtom(mapModeAtom);
 
   // Location permissions effect
   useEffect(() => {
@@ -65,8 +64,8 @@ function App() {
 
   // Set RTSMapView to non-empty on mount
   useEffect(() => {
-    setMapState({ mode: "SHOWING_ROUTES", routeNumbers: [20] });
-  }, [setMapState]);
+    setMapMode({ mode: "SHOWING_ROUTES", routeNumbers: [20] });
+  }, [setMapMode]);
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
