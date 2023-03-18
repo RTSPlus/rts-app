@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetView, useBottomSheetInternal } from "@gorhom/bottom-sheet";
 import { useAtomValue, useSetAtom } from "jotai";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -9,31 +9,60 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { State } from "react-native-gesture-handler";
+import { useAnimatedReaction } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
-import { sheetIndexAtom } from "./RTSBottomSheet/RTSBottomSheet";
+import {
+  SheetMachineValueAtom,
+  SheetViewMachineAtom,
+} from "./RTSBottomSheet/RTSBottomSheet";
 import { colors } from "../colors";
 
 export default function HomeView2() {
   const searchInputRef = useRef<TextInput>(null);
 
-  const [searchFocused, setSearchFocused] = useState(false);
+  // Very marginal? possible render optimization by using derived read-only atoms
+  const sheetMachineSend = useSetAtom(SheetViewMachineAtom);
+  const sheetMachineValue = useAtomValue(SheetMachineValueAtom);
 
-  const setSheetIndex = useSetAtom(sheetIndexAtom);
-
-  const onFocus = useCallback(() => {
-    setSheetIndex(2);
-    setSearchFocused(true);
-  }, [setSheetIndex]);
-
-  const onBlur = useCallback(() => {
-    setSearchFocused(false);
-  }, []);
-
-  const onCancelPress = useCallback(() => {
+  const onCancel = () => {
     searchInputRef.current?.blur();
-    setSheetIndex(1);
-  }, [setSheetIndex]);
+    sheetMachineSend("EXIT_SEARCH");
+  };
+
+  useEffect(() => {
+    if (sheetMachineValue === "home") {
+      searchInputRef.current?.blur();
+    }
+  }, [sheetMachineValue]);
+
+  const { animatedIndex, animatedContentGestureState } =
+    useBottomSheetInternal();
+
+  // Handle sheet transition
+  useAnimatedReaction(
+    () => ({
+      index: animatedIndex.value,
+      gestureState: animatedContentGestureState.value,
+    }),
+    ({ index, gestureState }) => {
+      if (sheetMachineValue === "transitioning_to_search") {
+        if (index >= 1.95) {
+          sheetMachineSend("FINISHED_TRANSITION");
+        }
+      } else if (sheetMachineValue === "search") {
+        if (gestureState === State.ACTIVE) {
+          searchInputRef.current?.blur();
+        }
+
+        if (index <= 1) {
+          sheetMachineSend("EXIT_SEARCH");
+        }
+      }
+    },
+    [sheetMachineValue, sheetMachineSend, searchInputRef.current]
+  );
 
   return (
     <BottomSheetView style={styles.container}>
@@ -48,19 +77,22 @@ export default function HomeView2() {
           <TextInput
             ref={searchInputRef}
             style={styles.searchBarInput}
-            placeholder="Search stops, routes, and places"
+            placeholder="Search routes, stops, & places"
             placeholderTextColor={colors.ios.light.gray["1"].toRgbString()}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
+            // onBlur={() => sheetMachineSend("EXIT_SEARCH")}
           />
         </BottomSheetView>
-        {match(searchFocused)
+        {match(
+          sheetMachineValue === "search" ||
+            sheetMachineValue === "transitioning_to_search"
+        )
           .with(true, () => (
             <TouchableOpacity
               style={{
                 marginLeft: 16,
               }}
-              onPress={onCancelPress}
+              onPress={onCancel}
             >
               <Text
                 style={{
@@ -116,5 +148,6 @@ const styles = StyleSheet.create({
   },
   searchBarInput: {
     fontSize: 16,
+    flex: 1,
   },
 });
