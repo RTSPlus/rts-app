@@ -1,20 +1,10 @@
-import BottomSheet, {
-  BottomSheetBackdrop,
-  useBottomSheetSpringConfigs,
-} from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { useSetAtom } from "jotai";
 import { NativeBaseProvider } from "native-base";
-import React, {
-  useEffect,
-  useRef,
-  useCallback,
-  ComponentProps,
-  PropsWithChildren,
-} from "react";
+import React, { useEffect, PropsWithChildren } from "react";
 import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
@@ -22,8 +12,7 @@ import {
 } from "react-native-safe-area-context";
 
 import { colors } from "./colors";
-import HomeView from "./components/HomeView";
-import HomeView2 from "./components/HomeView2";
+import RTSBottomSheet from "./components/RTSBottomSheet/RTSBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
 import { ControllerProvider } from "./controller/Controller";
 
@@ -42,10 +31,6 @@ const Providers = (props: PropsWithChildren) => {
 };
 
 function App() {
-  // hooks
-  const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["12.5%", "50%", "92%"];
-
   const setMapMode = useSetAtom(mapModeAtom);
 
   // Location permissions effect
@@ -67,48 +52,12 @@ function App() {
     setMapMode({ mode: "SHOWING_ROUTES", routeNumbers: [20] });
   }, [setMapMode]);
 
-  // Spring animation config
-  const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
-    damping: 80,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
-    stiffness: 500,
-  });
-
-  const backdropComponent = useCallback(
-    (props: ComponentProps<typeof BottomSheetBackdrop>) => (
-      <BottomSheetBackdrop
-        {...props}
-        appearsOnIndex={2}
-        disappearsOnIndex={1}
-        opacity={0.2}
-        pressBehavior="none"
-      />
-    ),
-    []
-  );
-
   return (
     <Providers>
       <View style={styles.container}>
         <RTSMapView style={styles.map} />
         <StatusBarBlurry />
-        <BottomSheet
-          ref={sheetRef}
-          index={1}
-          snapPoints={snapPoints}
-          style={styles.bottomSheetContainer}
-          handleIndicatorStyle={{
-            backgroundColor: colors.ios.light.gray["2"].toRgbString(),
-          }}
-          animationConfigs={bottomSheetAnimationConfigs}
-          backdropComponent={backdropComponent}
-          enablePanDownToClose={false}
-        >
-          <HomeView />
-          {/* <HomeView2 sheetRef={sheetRef} /> */}
-        </BottomSheet>
+        <RTSBottomSheet />
       </View>
     </Providers>
   );
@@ -150,22 +99,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
-  },
-  bottomSheetContainer: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
-  },
-  bottomSheetContent: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
 
