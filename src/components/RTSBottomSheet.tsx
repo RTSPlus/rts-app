@@ -8,9 +8,9 @@ import { ComponentProps, useCallback, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { assign, createMachine } from "xstate";
 
-import { colors } from "../../colors";
-import HomeView from "../HomeView";
-import HomeView2 from "../HomeView2";
+import { colors } from "../colors";
+import HomeView from "./HomeView/HomeView";
+import HomeView2 from "./HomeView/HomeView2";
 
 const sheetViewMachine = createMachine({
   id: "sheetViewMachine",
@@ -94,8 +94,8 @@ export default function RTSBottomSheet() {
         backdropComponent={backdropComponent}
         enablePanDownToClose={false}
       >
-        <HomeView />
-        {/* <HomeView2 /> */}
+        {/* <HomeView /> */}
+        <HomeView2 />
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
       {sheetMachineState.value === "transitioning_to_search" && (

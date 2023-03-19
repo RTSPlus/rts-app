@@ -13,11 +13,10 @@ import { State } from "react-native-gesture-handler";
 import { useAnimatedReaction } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
-import {
-  SheetMachineValueAtom,
-  SheetViewMachineAtom,
-} from "./RTSBottomSheet/RTSBottomSheet";
-import { colors } from "../colors";
+import HomeViewBody from "./HomeViewBody";
+import { colors } from "../../colors";
+import { SheetMachineValueAtom, SheetViewMachineAtom } from "../RTSBottomSheet";
+import SearchViewBody from "../SearchView/SearchViewBody";
 
 export default function HomeView2() {
   const searchInputRef = useRef<TextInput>(null);
@@ -66,6 +65,7 @@ export default function HomeView2() {
 
   return (
     <BottomSheetView style={styles.container}>
+      {/* Search Bar Row */}
       <BottomSheetView style={styles.searchRowContainer}>
         <BottomSheetView style={styles.searchBarContainer}>
           <Ionicons
@@ -80,7 +80,6 @@ export default function HomeView2() {
             placeholder="Search routes, stops, & places"
             placeholderTextColor={colors.ios.light.gray["1"].toRgbString()}
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
-            // onBlur={() => sheetMachineSend("EXIT_SEARCH")}
           />
         </BottomSheetView>
         {match(
@@ -116,6 +115,14 @@ export default function HomeView2() {
           ))
           .exhaustive()}
       </BottomSheetView>
+
+      {/* Body */}
+      {match(sheetMachineValue)
+        .with("home", () => <HomeViewBody />)
+        .with("search", "transitioning_to_search", () => <SearchViewBody />)
+        .otherwise(() => (
+          <Text>Unknown</Text>
+        ))}
     </BottomSheetView>
   );
 }
