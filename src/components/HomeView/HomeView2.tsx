@@ -130,12 +130,12 @@ export default function HomeView2() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
   },
   searchRowContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
+    paddingHorizontal: 16,
   },
   searchBarContainer: {
     flex: 1,

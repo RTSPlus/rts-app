@@ -8,9 +8,9 @@ import { ComponentProps, useCallback, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { assign, createMachine } from "xstate";
 
-import { colors } from "../colors";
 import HomeView from "./HomeView/HomeView";
 import HomeView2 from "./HomeView/HomeView2";
+import { colors } from "../colors";
 
 const sheetViewMachine = createMachine({
   id: "sheetViewMachine",
