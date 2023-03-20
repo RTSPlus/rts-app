@@ -13,7 +13,7 @@ import {
 
 import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
-import RTSBottomSheet from "./components/MainBottomSheet";
+import MainBottomSheet from "./components/MainBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
 
 LogBox.ignoreLogs([
@@ -70,7 +70,7 @@ function App() {
       <View style={styles.container}>
         <RTSMapView style={styles.map} />
         <StatusBarBlurry />
-        <RTSBottomSheet />
+        <MainBottomSheet />
       </View>
     </Providers>
   );

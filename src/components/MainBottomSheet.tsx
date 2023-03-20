@@ -51,7 +51,7 @@ export const SheetMachineValueAtom = atom(
   (get) => get(SheetViewMachineAtom).value
 );
 
-export default function RTSBottomSheet() {
+export default function MainBottomSheet() {
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
