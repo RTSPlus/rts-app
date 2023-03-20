@@ -14,7 +14,7 @@ import {
 import { colors } from "./colors";
 import RTSBottomSheet from "./components/RTSBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
-import { ControllerProvider } from "./controller/Controller";
+import { ControllerProvider } from "./api-controller/Controller";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
