@@ -22,6 +22,8 @@ import { match } from "ts-pattern";
 import { SheetMachineValueAtom, SheetViewMachineAtom } from "./StateMachine";
 import { colors } from "../../colors";
 import HomeView2 from "../HomeView/HomeView2";
+import HomeViewBody from "../HomeView/HomeViewBody";
+import SearchViewBody from "../SearchView/SearchViewBody";
 
 // #endregion
 
@@ -170,6 +172,11 @@ export default function MainBottomSheet() {
     []
   );
 
+  const body = match(sheetState.value)
+    .with("home", () => <HomeViewBody />)
+    .with("search", "transitioning_to_search", () => <SearchViewBody />)
+    .otherwise(() => <Text>Unknown</Text>);
+
   return (
     <>
       <BottomSheet
@@ -191,7 +198,7 @@ export default function MainBottomSheet() {
       >
         <SearchBar />
         {/* <HomeView /> */}
-        <HomeView2 />
+        {body}
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
       {sheetState.value === "transitioning_to_search" && (
