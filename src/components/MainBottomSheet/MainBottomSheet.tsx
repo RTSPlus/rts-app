@@ -6,7 +6,7 @@ import BottomSheet, {
   useBottomSheetInternal,
   useBottomSheetSpringConfigs,
 } from "@gorhom/bottom-sheet";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import React, { ComponentProps, useCallback, useEffect, useRef } from "react";
 import {
   StyleSheet,
@@ -58,14 +58,21 @@ function SearchBar() {
     }),
     ({ index, gestureState }) => {
       if (sheetMachineValue === "transitioning_to_search") {
+        // Render the bottom sheet un-interactive when we are transitioning to the search view
+        // to prevent weird bugs/behaviors. Necessary to feel more natural
         if (index >= 1.95) {
           runOnJS(sheetMachineSend)("FINISHED_TRANSITION");
         }
       } else if (sheetMachineValue === "search") {
+        // Blur keyboard when we being to swipe down
         if (gestureState === State.ACTIVE) {
           runOnJS(blurSearchInput)();
         }
 
+        // This is required because for some reason, `onAnimate` in the BottomSheet prop will not
+        // fire when the sheet is transitioning from the search view to the home view
+        // However, that event transition should be preferred as it runs faster
+        // This is a backup in case that event transition fails
         if (index <= 1) {
           runOnJS(sheetMachineSend)("EXIT_SEARCH");
         }
@@ -137,7 +144,7 @@ function SearchBar() {
 
 export default function MainBottomSheet() {
   // hooks
-  const sheetState = useAtomValue(SheetViewMachineAtom);
+  const [sheetState, sheetSend] = useAtom(SheetViewMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
 
@@ -176,6 +183,11 @@ export default function MainBottomSheet() {
         animationConfigs={bottomSheetAnimationConfigs}
         backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
+        onAnimate={(from) => {
+          if (sheetState.value === "search" && from === 2) {
+            sheetSend("EXIT_SEARCH");
+          }
+        }}
       >
         <SearchBar />
         {/* <HomeView /> */}
