@@ -10,12 +10,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { State } from "react-native-gesture-handler";
-import { useAnimatedReaction } from "react-native-reanimated";
+import { runOnJS, useAnimatedReaction } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
 import HomeViewBody from "./HomeViewBody";
 import { colors } from "../../colors";
-import { SheetMachineValueAtom, SheetViewMachineAtom } from "../RTSBottomSheet";
+import {
+  SheetMachineValueAtom,
+  SheetViewMachineAtom,
+} from "../MainBottomSheet";
 import SearchViewBody from "../SearchView/SearchViewBody";
 
 export default function HomeView2() {
@@ -34,10 +37,14 @@ export default function HomeView2() {
     if (sheetMachineValue === "home") {
       searchInputRef.current?.blur();
     }
-  }, [sheetMachineValue]);
+  }, [searchInputRef, sheetMachineValue]);
 
   const { animatedIndex, animatedContentGestureState } =
     useBottomSheetInternal();
+
+  const blurSearchInput = () => {
+    searchInputRef.current?.blur();
+  };
 
   // Handle sheet transition
   useAnimatedReaction(
@@ -48,26 +55,35 @@ export default function HomeView2() {
     ({ index, gestureState }) => {
       if (sheetMachineValue === "transitioning_to_search") {
         if (index >= 1.95) {
-          sheetMachineSend("FINISHED_TRANSITION");
+          runOnJS(sheetMachineSend)("FINISHED_TRANSITION");
         }
       } else if (sheetMachineValue === "search") {
         if (gestureState === State.ACTIVE) {
-          searchInputRef.current?.blur();
+          runOnJS(blurSearchInput)();
         }
 
         if (index <= 1) {
-          sheetMachineSend("EXIT_SEARCH");
+          runOnJS(sheetMachineSend)("EXIT_SEARCH");
         }
       }
     },
-    [sheetMachineValue, sheetMachineSend, searchInputRef.current]
+    [sheetMachineValue, sheetMachineSend, blurSearchInput]
   );
+
+  const body = match(sheetMachineValue)
+    .with("home", () => <HomeViewBody />)
+    .with("search", "transitioning_to_search", () => <SearchViewBody />)
+    .otherwise(() => <Text>Unknown</Text>);
 
   return (
     <BottomSheetView style={styles.container}>
-      {/* Search Bar Row */}
+      {/* ----Search Bar Row---- */}
       <BottomSheetView style={styles.searchRowContainer}>
-        <BottomSheetView style={styles.searchBarContainer}>
+        <BottomSheetView
+          style={styles.searchBarContainer}
+          // Pass on touches to the TextInput to expand the touchable area
+          onTouchStart={() => searchInputRef.current?.focus()}
+        >
           <Ionicons
             style={styles.searchBarIcon}
             name="ios-search-outline"
@@ -82,6 +98,7 @@ export default function HomeView2() {
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
           />
         </BottomSheetView>
+        {/* ----Body---- */}
         {match(
           sheetMachineValue === "search" ||
             sheetMachineValue === "transitioning_to_search"
@@ -117,12 +134,7 @@ export default function HomeView2() {
       </BottomSheetView>
 
       {/* Body */}
-      {match(sheetMachineValue)
-        .with("home", () => <HomeViewBody />)
-        .with("search", "transitioning_to_search", () => <SearchViewBody />)
-        .otherwise(() => (
-          <Text>Unknown</Text>
-        ))}
+      {body}
     </BottomSheetView>
   );
 }
