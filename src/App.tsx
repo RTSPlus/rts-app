@@ -13,7 +13,7 @@ import {
 
 import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
-import MainBottomSheet from "./components/MainBottomSheet";
+import MainBottomSheet from "./components/MainBottomSheet/MainBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
 
 LogBox.ignoreLogs([

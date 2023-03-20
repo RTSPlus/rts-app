@@ -32,7 +32,7 @@ export default function HomeViewBody() {
         </TouchableOpacity>
       </HStack>
 
-      <View style={{ backgroundColor: "red" }}>
+      <View>
         {/* Routes Information Container */}
         <Box
           width="90%"
