@@ -1,5 +1,6 @@
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 import { colors } from "../../colors";
 
@@ -24,24 +25,20 @@ const SearchItem = () => {
 };
 
 export default function SearchViewBody() {
-  const testList = [
-    {
-      title: "Test 1",
-    },
-    {
-      title: "Test 2",
-    },
-  ];
-
   return (
-    <BottomSheetView style={{ flex: 1 }}>
+    <>
       <View style={styles.topDivider} />
-      <BottomSheetScrollView style={{ flex: 1 }}>
-        {testList.map((item, index) => (
-          <SearchItem key={index} />
-        ))}
+      <BottomSheetScrollView contentContainerStyle={styles.scrollView}>
+        {Array(15)
+          .fill(0)
+          .map((item, index) => (
+            <>
+              <SearchItem key={index} />
+              <View style={styles.searchItemDivider} />
+            </>
+          ))}
       </BottomSheetScrollView>
-    </BottomSheetView>
+    </>
   );
 }
 
@@ -52,14 +49,19 @@ const styles = StyleSheet.create({
     marginTop: 16,
     backgroundColor: colors.ios.light.gray["5"].toRgbString(),
   },
+  scrollView: {
+    marginHorizontal: 16,
+  },
+  searchItemDivider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: colors.ios.light.gray["5"].toRgbString(),
+  },
   searchItem: {
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 16,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.ios.light.gray["5"].toRgbString(),
   },
   searchItemContent: {
     marginLeft: 16,
