@@ -11,10 +11,10 @@ import {
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
+import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
 import RTSBottomSheet from "./components/RTSBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
-import { ControllerProvider } from "./api-controller/Controller";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
@@ -29,6 +29,19 @@ const Providers = (props: PropsWithChildren) => {
     </SafeAreaProvider>
   );
 };
+
+function StatusBarBlurry() {
+  return (
+    <>
+      <StatusBar style="dark" />
+      <SafeAreaInsetsContext.Consumer>
+        {(insets) => (
+          <BlurView style={{ ...styles.statusBar, height: insets?.top ?? 0 }} />
+        )}
+      </SafeAreaInsetsContext.Consumer>
+    </>
+  );
+}
 
 function App() {
   const setMapMode = useSetAtom(mapModeAtom);
@@ -60,19 +73,6 @@ function App() {
         <RTSBottomSheet />
       </View>
     </Providers>
-  );
-}
-
-function StatusBarBlurry() {
-  return (
-    <>
-      <StatusBar style="dark" />
-      <SafeAreaInsetsContext.Consumer>
-        {(insets) => (
-          <BlurView style={{ ...styles.statusBar, height: insets?.top ?? 0 }} />
-        )}
-      </SafeAreaInsetsContext.Consumer>
-    </>
   );
 }
 
