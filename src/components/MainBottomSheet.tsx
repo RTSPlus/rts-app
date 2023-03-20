@@ -58,14 +58,14 @@ export default function RTSBottomSheet() {
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
-    damping: 80,
+    damping: 40,
     overshootClamping: true,
     restDisplacementThreshold: 0.1,
     restSpeedThreshold: 0.1,
     stiffness: 500,
   });
 
-  const backdropComponent = useCallback(
+  const BackdropComponent = useCallback(
     (props: ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop
         {...props}
@@ -91,16 +91,16 @@ export default function RTSBottomSheet() {
           backgroundColor: colors.ios.light.gray["2"].toRgbString(),
         }}
         animationConfigs={bottomSheetAnimationConfigs}
-        backdropComponent={backdropComponent}
+        backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
       >
         {/* <HomeView /> */}
         <HomeView2 />
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
-      {sheetMachineState.value === "transitioning_to_search" && (
+      {/* {sheetMachineState.value === "transitioning_to_search" && (
         <View style={StyleSheet.absoluteFill} />
-      )}
+      )} */}
     </>
   );
 }

@@ -13,7 +13,7 @@ import {
 
 import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
-import RTSBottomSheet from "./components/RTSBottomSheet";
+import RTSBottomSheet from "./components/MainBottomSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
 
 LogBox.ignoreLogs([
@@ -55,7 +55,7 @@ function App() {
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({});
+      // const location = await Location.getCurrentPositionAsync({});
       // console.log(location);
     })();
   }, []);
