@@ -12,7 +12,7 @@ const SearchItem = () => {
           height: 32,
           width: 32,
           backgroundColor: "red",
-          borderRadius: "100%",
+          borderRadius: 16,
         }}
       />
       <View style={styles.searchItemContent}>
