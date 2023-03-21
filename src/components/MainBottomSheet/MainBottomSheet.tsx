@@ -18,7 +18,16 @@ import {
   Animated,
 } from "react-native";
 import { State } from "react-native-gesture-handler";
-import { runOnJS, useAnimatedReaction } from "react-native-reanimated";
+import {
+  default as Reanimated,
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+} from "react-native-reanimated";
 import { match } from "ts-pattern";
 
 import { SheetMachineValueAtom, SheetViewMachineAtom } from "./StateMachine";
@@ -40,7 +49,6 @@ function SearchBar() {
     useBottomSheetInternal();
 
   const rightIconWidthAnim = useRef(new Animated.Value(48)).current;
-
   // #endregion
 
   // #region Handles
@@ -127,11 +135,11 @@ function SearchBar() {
   return (
     <>
       {/* ----Search Bar Row---- */}
-      <BottomSheetView style={styles.searchRowContainer}>
+      <View style={styles.searchRowContainer}>
         <BottomSheetView
           style={styles.searchBarContainer}
           // Pass on touches to the TextInput to expand the touchable area
-          onTouchStart={() => searchInputRef.current?.focus()}
+          onTouchEnd={() => searchInputRef.current?.focus()}
         >
           <Ionicons
             style={styles.searchBarIcon}
@@ -187,16 +195,29 @@ function SearchBar() {
             ))
             .exhaustive()}
         </Animated.View>
-      </BottomSheetView>
+      </View>
     </>
   );
 }
 
 export default function MainBottomSheet() {
-  // hooks
+  // Hooks
   const [sheetState, sheetSend] = useAtom(SheetViewMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
+
+  // Animation for body opacity
+  const sheetAnimatedIndex = useSharedValue(1);
+  const bodyOpacity = useDerivedValue(
+    () =>
+      interpolate(sheetAnimatedIndex.value, [0, 0.2], [0, 1], {
+        extrapolateRight: Extrapolation.CLAMP,
+      }),
+    []
+  );
+  const bodyAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: bodyOpacity.value,
+  }));
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
@@ -238,6 +259,7 @@ export default function MainBottomSheet() {
         animationConfigs={bottomSheetAnimationConfigs}
         backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
+        animatedIndex={sheetAnimatedIndex}
         onAnimate={(from) => {
           if (sheetState.value === "search" && from === 2) {
             sheetSend("EXIT_SEARCH");
@@ -246,7 +268,9 @@ export default function MainBottomSheet() {
       >
         <SearchBar />
         {/* <HomeView /> */}
-        {body}
+        <Reanimated.View style={[{ flex: 1 }, bodyAnimatedStyle]}>
+          {body}
+        </Reanimated.View>
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
       {sheetState.value === "transitioning_to_search" && (
