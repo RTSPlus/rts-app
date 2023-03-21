@@ -8,12 +8,14 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import React, { ComponentProps, useCallback, useEffect, useRef } from "react";
+import AppleEasing from "react-apple-easing";
 import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
   Text,
+  Animated,
 } from "react-native";
 import { State } from "react-native-gesture-handler";
 import { runOnJS, useAnimatedReaction } from "react-native-reanimated";
@@ -21,13 +23,13 @@ import { match } from "ts-pattern";
 
 import { SheetMachineValueAtom, SheetViewMachineAtom } from "./StateMachine";
 import { colors } from "../../colors";
-import HomeView2 from "../HomeView/HomeView2";
 import HomeViewBody from "../HomeView/HomeViewBody";
 import SearchViewBody from "../SearchView/SearchViewBody";
 
 // #endregion
 
 function SearchBar() {
+  // #region State
   const searchInputRef = useRef<TextInput>(null);
 
   // Very marginal? possible render optimization by using derived read-only atoms
@@ -37,6 +39,11 @@ function SearchBar() {
   const { animatedIndex, animatedContentGestureState } =
     useBottomSheetInternal();
 
+  const rightIconWidthAnim = useRef(new Animated.Value(48)).current;
+
+  // #endregion
+
+  // #region Handles
   const onCancel = () => {
     searchInputRef.current?.blur();
     sheetMachineSend("EXIT_SEARCH");
@@ -45,12 +52,45 @@ function SearchBar() {
   const blurSearchInput = () => {
     searchInputRef.current?.blur();
   };
+  // #endregion
 
+  // #region Effects
+  // Blur side-effect
   useEffect(() => {
     if (sheetMachineValue === "home") {
       searchInputRef.current?.blur();
     }
   }, [searchInputRef, sheetMachineValue]);
+
+  // Right icon width side-effect
+  useEffect(() => {
+    const timingConfig = {
+      easing: AppleEasing.default,
+      useNativeDriver: false,
+      duration: 200,
+    };
+
+    match(sheetMachineValue)
+      .with("home", () => {
+        Animated.timing(rightIconWidthAnim, {
+          toValue: 48,
+          ...timingConfig,
+        }).start();
+      })
+      .with("transitioning_to_search", () => {
+        Animated.timing(rightIconWidthAnim, {
+          toValue: 72,
+          ...timingConfig,
+        }).start();
+      })
+      .with("search", () => {
+        Animated.timing(rightIconWidthAnim, {
+          toValue: 72,
+          ...timingConfig,
+        }).start();
+      })
+      .otherwise(() => {});
+  }, [sheetMachineValue, rightIconWidthAnim]);
 
   // Handle sheet transition
   useAnimatedReaction(
@@ -82,6 +122,7 @@ function SearchBar() {
     },
     [sheetMachineValue, sheetMachineSend, blurSearchInput]
   );
+  // #endregion
 
   return (
     <>
@@ -106,39 +147,46 @@ function SearchBar() {
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
           />
         </BottomSheetView>
-        {/* ----Body---- */}
-        {match(
-          sheetMachineValue === "search" ||
-            sheetMachineValue === "transitioning_to_search"
-        )
-          .with(true, () => (
-            <TouchableOpacity
-              style={{
-                marginLeft: 16,
-              }}
-              onPress={onCancel}
-            >
-              <Text
+        {/* Right icon */}
+        <Animated.View
+          style={{ alignItems: "flex-end", width: rightIconWidthAnim }}
+        >
+          {match(
+            sheetMachineValue === "search" ||
+              sheetMachineValue === "transitioning_to_search"
+          )
+            .with(true, () => (
+              <TouchableOpacity
                 style={{
-                  color: colors.ios.light.blue.toRgbString(),
-                  fontSize: 18,
+                  marginLeft: 16,
+                  position: "relative",
+                  alignItems: "center",
                 }}
+                onPress={onCancel}
               >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          ))
-          .with(false, () => (
-            <View
-              style={{
-                width: 32,
-                height: 32,
-                backgroundColor: "red",
-                marginLeft: 16,
-              }}
-            />
-          ))
-          .exhaustive()}
+                <Text
+                  style={{
+                    color: colors.ios.light.blue.toRgbString(),
+                    fontSize: 18,
+                    width: 56,
+                  }}
+                >
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            ))
+            .with(false, () => (
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: "red",
+                  marginLeft: 16,
+                }}
+              />
+            ))
+            .exhaustive()}
+        </Animated.View>
       </BottomSheetView>
     </>
   );
@@ -209,6 +257,7 @@ export default function MainBottomSheet() {
 }
 
 const styles = StyleSheet.create({
+  // #region Search Bar
   searchRowContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -235,7 +284,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
   },
-
+  // #endregion
+  // #region Bottom Sheet
   bottomSheetContainer: {
     shadowColor: "#000",
     shadowOffset: {
@@ -252,4 +302,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  // #endregion
 });
