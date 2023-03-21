@@ -1,4 +1,5 @@
 import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
+import { Fragment } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -32,10 +33,10 @@ export default function SearchViewBody() {
         {Array(15)
           .fill(0)
           .map((item, index) => (
-            <>
+            <Fragment key={index}>
               <SearchItem key={index} />
               <View style={styles.searchItemDivider} />
-            </>
+            </Fragment>
           ))}
       </BottomSheetScrollView>
     </>
