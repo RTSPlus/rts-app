@@ -1,7 +1,6 @@
-import { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Fragment } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 
 import { colors } from "../../colors";
 

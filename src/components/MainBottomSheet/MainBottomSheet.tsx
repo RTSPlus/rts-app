@@ -30,7 +30,11 @@ import {
 } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
-import { SheetMachineValueAtom, SheetViewMachineAtom } from "./StateMachine";
+import {
+  SheetMachineValueAtom,
+  SheetViewMachineAtom,
+  SheetViewMachineStates,
+} from "./StateMachine";
 import { colors } from "../../colors";
 import HomeViewBody from "../HomeView/HomeViewBody";
 import SearchViewBody from "../SearchView/SearchViewBody";
@@ -78,26 +82,20 @@ function SearchBar() {
       duration: 200,
     };
 
-    match(sheetMachineValue)
+    match(sheetMachineValue as SheetViewMachineStates)
       .with("home", () => {
         Animated.timing(rightIconWidthAnim, {
           toValue: 48,
           ...timingConfig,
         }).start();
       })
-      .with("transitioning_to_search", () => {
+      .with("transitioning_to_search", "search", () => {
         Animated.timing(rightIconWidthAnim, {
           toValue: 72,
           ...timingConfig,
         }).start();
       })
-      .with("search", () => {
-        Animated.timing(rightIconWidthAnim, {
-          toValue: 72,
-          ...timingConfig,
-        }).start();
-      })
-      .otherwise(() => {});
+      .exhaustive();
   }, [sheetMachineValue, rightIconWidthAnim]);
 
   // Handle sheet transition
@@ -241,10 +239,10 @@ export default function MainBottomSheet() {
     []
   );
 
-  const body = match(sheetState.value)
+  const body = match(sheetState.value as SheetViewMachineStates)
     .with("home", () => <HomeViewBody />)
     .with("search", "transitioning_to_search", () => <SearchViewBody />)
-    .otherwise(() => <Text>Unknown</Text>);
+    .exhaustive();
 
   return (
     <>
