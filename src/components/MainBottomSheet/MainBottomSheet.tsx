@@ -143,13 +143,16 @@ function SearchBar() {
             style={styles.searchBarIcon}
             name="ios-search-outline"
             size={20}
-            color={colors.ios.light.gray["1"].toRgbString()}
+            color={colors.ios.light.gray["1"].clone().darken().toRgbString()}
           />
           <TextInput
             ref={searchInputRef}
             style={styles.searchBarInput}
             placeholder="Search routes, stops, & places"
-            placeholderTextColor={colors.ios.light.gray["1"].toRgbString()}
+            placeholderTextColor={colors.ios.light.gray["1"]
+              .clone()
+              .darken()
+              .toRgbString()}
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
           />
         </BottomSheetView>
@@ -250,10 +253,10 @@ export default function MainBottomSheet() {
         ref={sheetRef}
         index={sheetState.context.sheetIndex}
         snapPoints={snapPoints}
-        style={styles.bottomSheetContainer}
-        handleIndicatorStyle={{
-          backgroundColor: colors.ios.light.gray["2"].toRgbString(),
-        }}
+        style={styles.bottomSheet}
+        handleStyle={styles.bottomSheetHandle}
+        handleIndicatorStyle={styles.bottomSheetHandleIndicator}
+        backgroundStyle={styles.bottomSheetBackgroundStyle}
         animationConfigs={bottomSheetAnimationConfigs}
         backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
@@ -266,7 +269,9 @@ export default function MainBottomSheet() {
       >
         <SearchBar />
         {/* <HomeView /> */}
-        <Reanimated.View style={[{ flex: 1 }, bodyAnimatedStyle]}>
+        <Reanimated.View
+          style={[{ ...styles.bottomSheetBackgroundStyle }, bodyAnimatedStyle]}
+        >
           {body}
         </Reanimated.View>
       </BottomSheet>
@@ -285,15 +290,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     paddingHorizontal: 16,
+    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
   },
   searchBarContainer: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.ios.light.gray["5"]
-      .clone()
-      .setAlpha(0.9)
-      .toRgbString(),
+    backgroundColor: colors.ios.light.gray["5"].toRgbString(),
     borderRadius: 8,
     height: 36,
     paddingHorizontal: 4,
@@ -308,7 +311,19 @@ const styles = StyleSheet.create({
   },
   // #endregion
   // #region Bottom Sheet
-  bottomSheetContainer: {
+  bottomSheetHandle: {
+    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  bottomSheetHandleIndicator: {
+    backgroundColor: colors.ios.light.gray["2"].toRgbString(),
+  },
+  bottomSheetBackgroundStyle: {
+    flex: 1,
+    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+  },
+  bottomSheet: {
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
