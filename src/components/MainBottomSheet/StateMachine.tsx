@@ -2,7 +2,27 @@ import { atom } from "jotai";
 import { atomWithMachine } from "jotai-xstate";
 import { assign, createMachine } from "xstate";
 
+type Context = {
+  sheetIndex: number;
+};
+
+type Events =
+  | {
+      type: "FOCUS_SEARCH";
+    }
+  | {
+      type: "EXIT_SEARCH";
+    }
+  | {
+      type: "FINISHED_TRANSITION";
+    };
+
 export const sheetViewMachine = createMachine({
+  tsTypes: {} as import("./StateMachine.typegen").Typegen0,
+  schema: {
+    context: {} as Context,
+    events: {} as Events,
+  },
   id: "sheetViewMachine",
   initial: "home",
   context: {
@@ -35,6 +55,9 @@ export const sheetViewMachine = createMachine({
   },
   predictableActionArguments: true,
 });
+
+export type SheetViewMachineStates =
+  (typeof sheetViewMachine)["__TResolvedTypesMeta"]["resolved"]["matchesStates"];
 
 export const SheetViewMachineAtom = atomWithMachine(sheetViewMachine);
 export const SheetMachineValueAtom = atom(
