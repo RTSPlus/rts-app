@@ -3,24 +3,49 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useRef, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useMemo,
+  useState,
+  useCallback,
+  createContext,
+} from "react";
 import { StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
-import RTSMapView from "./RTSMapView/RTSMapView";
+import { RTSMapView } from "./RTSMapView/RTSMapView";
 import { colors } from "./colors";
 import { ControllerProvider } from "./controller/Controller";
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
 import { NativeBaseProvider } from "native-base";
 import HomeView from "./Components/HomeView";
 
 function App() {
+  // states
+  const [displayRoute, setDisplayRoute] = useState(false);
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
 
   // hooks
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["15%", "50%", "90%"], []);
+
+  const handleToggleRouteDisplay = () => {
+    setDisplayRoute((prevState) => !prevState);
+  };
+
+  const handleSetOrigin = (input_origin: string) => {
+    setOrigin(input_origin);
+    console.log("Parent origin: ");
+    console.log(origin);
+  };
+
+  const handleSetDestination = (input_destination: string) => {
+    setDestination(input_destination);
+  };
 
   useEffect(() => {
     (async () => {
@@ -31,7 +56,6 @@ function App() {
       }
 
       const location = await Location.getCurrentPositionAsync({});
-      // console.log(location);
     })();
   }, []);
 
@@ -40,19 +64,26 @@ function App() {
       <ControllerProvider>
         <NativeBaseProvider>
           <View style={styles.container}>
-            <RTSMapView style={styles.map} />
+            <RTSMapView origin={origin} destination={destination} />
             <StatusBarBlurry />
-              <BottomSheet
-                ref={sheetRef}
-                index={1}
-                snapPoints={snapPoints}
-                style={styles.container}>
-                <BottomSheetScrollView
-                  horizontal = {false}
-                  contentContainerStyle={styles.contentContainer}>
-                  <HomeView />
-                </BottomSheetScrollView>
-              </BottomSheet>
+            <BottomSheet
+              ref={sheetRef}
+              index={1}
+              snapPoints={snapPoints}
+              style={styles.container}
+            >
+              <BottomSheetScrollView
+                horizontal={false}
+                contentContainerStyle={styles.contentContainer}
+              >
+                <HomeView
+                  origin={origin}
+                  setOrigin={handleSetOrigin}
+                  destination={destination}
+                  setDestination={handleSetDestination}
+                />
+              </BottomSheetScrollView>
+            </BottomSheet>
           </View>
         </NativeBaseProvider>
       </ControllerProvider>
@@ -99,9 +130,8 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   contentContainer: {
-    width: Dimensions.get('screen').width,
+    width: Dimensions.get("screen").width,
     alignItems: "center",
     justifyContent: "center",
-
-  }
+  },
 });

@@ -7,7 +7,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "format": "prettier --write '**/*.{js,jsx,ts,tsx,json,md}'"
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
@@ -24,7 +25,7 @@
     "expo-blur": "~12.0.1",
     "expo-linear-gradient": "~12.0.1",
     "expo-location": "~15.0.1",
-    "expo-status-bar": "~1.4.2",
+    "expo-status-bar": "~1.4.4",
     "native-base": "^3.4.25",
     "node-vincenty": "^0.0.6",
     "react": "18.1.0",
@@ -56,7 +57,7 @@
     "@typescript-eslint/parser": "^5.49.0",
     "eslint": "^8.33.0",
     "eslint-config-universe": "^11.1.1",
-    "prettier": "^2.8.3",
+    "prettier": "2.8.6",
     "react-devtools": "^4.27.1",
     "react-native-dotenv": "^3.4.7"
   },

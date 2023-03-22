@@ -1,12 +1,18 @@
-import React, { useEffect, useCallback, useRef, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useState,
+} from "react";
 import { Text, Button } from "react-native";
 import { StyleSheet, View } from "react-native";
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
 import { colors } from "../colors";
 import { Container } from "native-base";
 
 const FavoritesView = () => {
-  return(
+  return (
     <View style={styles.container}>
       <Container>
         <Text>
@@ -16,15 +22,15 @@ const FavoritesView = () => {
       </Container>
     </View>
   );
-}
+};
 
 export default FavoritesView;
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
