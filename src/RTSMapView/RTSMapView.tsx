@@ -1,19 +1,16 @@
 import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
-import { ViewProps } from "react-native";
+import { ViewProps, StyleSheet } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 
 import { useVehicleLocations } from "./useVehicleLocations";
 import { useAvailableRoutes } from "../controller/useAvailableRoutes";
 import { getRoutePattern } from "../rts-api/rts";
 import { hasPresentKey } from "ts-is-present";
+import MapViewDirections from "react-native-maps-directions";
+import { RTS_GOOGLE_API_KEY } from "@env";
+import { DirectionsRoute } from "./DirectionsRoute";
 import React from "react";
-import MapViewDirections from 'react-native-maps-directions';
-import { RTS_GOOGLE_API_KEY } from '@env';
-
-// test route
-const origin = {latitude: 29.721175, longitude: -82.363335};
-const destination = {latitude: 29.6481658, longitude: -82.3454982};
 
 // TODO testing only
 const bounds = {
@@ -30,10 +27,20 @@ const initialRegion = {
   longitudeDelta: bounds.lat_max - bounds.lat_min,
 };
 
-export default function RTSMapView(props: ViewProps) {
+type MapViewProps = {
+  origin: string;
+  destination: string;
+};
+
+const RTSMapView = React.memo(({ origin, destination }: MapViewProps) => {
+  // export default function RTSMapView({ origin, destination }: MapViewProps) {
+  console.log("in mapview");
   const { data: availableRoutes } = useAvailableRoutes();
 
   const [selectedRoutes, setSelectedRoutes] = useState<number[]>([5, 20]);
+  // const [origin, setOrigin] = useState('');
+  // const [destination, setDestination] = useState('');
+  const [displayRoute, setDisplayRoute] = useState(true); // Tie to Get Direction Click on HomeView
 
   // Intersection of selectedRoutes and availableRoutes
   const availableSelectedRoutes = (availableRoutes ?? []).filter((e) =>
@@ -51,22 +58,19 @@ export default function RTSMapView(props: ViewProps) {
     .map((e) => e.data);
 
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
-  console.log(vehicleLocations);
-
+  const transitOptions = {
+    modes: ["walking"],
+    routingPreference: "fewer_transfers",
+  };
   return (
-    <MapView {...props} 
+    <MapView
+      style={styles.map}
       initialRegion={initialRegion}
       showsUserLocation={true}
       followsUserLocation={true}
-      >
-        {/* <MapViewDirections
-          origin={origin}
-          destination={destination}
-          apikey={RTS_GOOGLE_API_KEY}
-          strokeWidth={3}
-          strokeColor="hotpink"
-          optimizeWaypoints={true}
-        /> */}
+    >
+      <DirectionsRoute origin={origin} destination={destination} />
+
       {routePatterns.map((rt) => (
         <Polyline
           key={rt.num}
@@ -94,4 +98,14 @@ export default function RTSMapView(props: ViewProps) {
         ))}
     </MapView>
   );
-}
+});
+
+export { RTSMapView };
+
+const styles = StyleSheet.create({
+  map: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+  },
+});
