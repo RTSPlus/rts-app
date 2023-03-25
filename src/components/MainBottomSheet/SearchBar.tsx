@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useBottomSheetInternal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useSetAtom, useAtomValue } from "jotai";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import AppleEasing from "react-apple-easing";
 import {
   TextInput,
@@ -23,8 +23,37 @@ import {
   SheetViewMachineStates,
 } from "./StateMachine";
 import { colors } from "../../colors";
+import { RTS_GOOGLE_API_KEY } from "@env";
 
-export default function SearchBar() {
+export default function SearchBar(props:any) {
+  const [query, setQuery] = useState('');
+  // const [searchResults, setSearchResults] = useState([]);
+
+  const handleSearch = async (query:any) => {
+    if (query.length >= 3) {
+      const results = await searchPlaces(query);
+      props.setSearchResults(results);
+    }
+  };
+
+  const handleQueryChange = (text:string) => {
+    setQuery(text);
+    handleSearch(text);
+  };
+
+  const searchPlaces = async (query:any) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${RTS_GOOGLE_API_KEY}&input=${query}`
+      );
+      const data = await response.json();
+      const descriptions = data.predictions.map((prediction: any) => prediction.description);
+      return descriptions;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // #region State
   const searchInputRef = useRef<TextInput>(null);
 
@@ -56,6 +85,10 @@ export default function SearchBar() {
       searchInputRef.current?.blur();
     }
   }, [searchInputRef, sheetMachineValue]);
+
+  useEffect(() => {
+    handleSearch(query);
+  }, [query]);
 
   // Right icon width side-effect
   useEffect(() => {
@@ -129,6 +162,7 @@ export default function SearchBar() {
             color={colors.ios.light.gray["1"].clone().darken().toRgbString()}
           />
           <TextInput
+            onChangeText={handleQueryChange}
             ref={searchInputRef}
             style={styles.searchBarInput}
             placeholder="Search routes, stops, & places"

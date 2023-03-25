@@ -4,7 +4,7 @@ import BottomSheet, {
   useBottomSheetSpringConfigs,
 } from "@gorhom/bottom-sheet";
 import { useAtom } from "jotai";
-import React, { ComponentProps, useCallback, useRef } from "react";
+import React, { ComponentProps, useCallback, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   default as Reanimated,
@@ -29,6 +29,7 @@ export default function MainBottomSheet() {
   const [sheetState, sheetSend] = useAtom(SheetViewMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
+  const [searchResults, setSearchResults] = useState([]);
 
   // Animation for body opacity
   const sheetAnimatedIndex = useSharedValue(1);
@@ -67,7 +68,9 @@ export default function MainBottomSheet() {
 
   const body = match(sheetState.value as SheetViewMachineStates)
     .with("home", () => <HomeViewBody />)
-    .with("search", "transitioning_to_search", () => <SearchViewBody />)
+    .with("search", "transitioning_to_search", () => (
+      <SearchViewBody searchResults={searchResults} />
+    ))
     .exhaustive();
 
   return (
@@ -90,7 +93,7 @@ export default function MainBottomSheet() {
           }
         }}
       >
-        <SearchBar />
+        <SearchBar setSearchResults={setSearchResults} />
         {/* <HomeView /> */}
         <Reanimated.View
           style={[{ ...styles.bottomSheetBackgroundStyle }, bodyAnimatedStyle]}

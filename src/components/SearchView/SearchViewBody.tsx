@@ -1,8 +1,8 @@
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Fragment } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
-
 import { colors } from "../../colors";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const SearchItem = () => {
   return (
@@ -24,11 +24,32 @@ const SearchItem = () => {
   );
 };
 
-export default function SearchViewBody() {
+const GoogleAutocompleteSearchItem = (props: any) => {
+  return (
+    <TouchableOpacity style={styles.searchItem}>
+      {/* Placeholder icon */}
+      <Icon
+        name="map-marker"
+        size={35}
+        color="black"
+        style={{ alignItems: "center" }}
+      />
+      <View style={styles.searchItemContent}>
+        <Text>{props.description}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export default function SearchViewBody(props: any) {
+  console.log("In search view body" + props.searchResults);
   return (
     <>
       <View style={styles.topDivider} />
       <BottomSheetScrollView contentContainerStyle={styles.scrollView}>
+        {props.searchResults.map((item: { description: any }, index: any) => (
+          <GoogleAutocompleteSearchItem key={index} description={item} />
+        ))}
         {Array(15)
           .fill(0)
           .map((item, index) => (
