@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { Container } from "native-base";
 
 const AllRoutesView = () => {
-  return(
+  return (
     <View style={styles.container}>
       <Container>
         <Text>
@@ -14,14 +14,14 @@ const AllRoutesView = () => {
       </Container>
     </View>
   );
-}
+};
 
 export default AllRoutesView;
 
 const styles = StyleSheet.create({
-    container: {
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
+  container: {
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

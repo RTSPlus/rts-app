@@ -1,13 +1,19 @@
-import React, { useEffect, useCallback, useRef, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useState,
+} from "react";
 import { Text, Button } from "react-native";
 import { StyleSheet, View } from "react-native";
-import { Dimensions } from 'react-native';
+import { Dimensions } from "react-native";
 import { colors } from "../colors";
 import { Container } from "native-base";
 
 // pass in props of route/bus selected and display data from db
-const DetailedRouteView = ({route}: {route:string}) => {
-  return(
+const DetailedRouteView = ({ route }: { route: string }) => {
+  return (
     <View style={styles.container}>
       <Container>
         <Text>
@@ -17,15 +23,15 @@ const DetailedRouteView = ({route}: {route:string}) => {
       </Container>
     </View>
   );
-}
+};
 
 export default DetailedRouteView;
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
