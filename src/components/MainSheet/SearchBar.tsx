@@ -15,10 +15,10 @@ import { useAnimatedReaction, runOnJS } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
 import {
-  SheetViewMachineAtom,
-  SheetMachineValueAtom,
+  MainSheetMachineAtom,
+  MainSheetMachineValueAtom,
   SheetViewMachineStates,
-} from "./StateMachine";
+} from "./MainSheetMachine";
 import { colors } from "../../colors";
 import { AppleEasing } from "../../utils/easing";
 
@@ -31,8 +31,8 @@ export default function SearchBar(props: Props) {
   const searchInputRef = useRef<TextInput>(null);
 
   // Very marginal? possible render optimization by using derived read-only atoms
-  const sheetMachineSend = useSetAtom(SheetViewMachineAtom);
-  const sheetMachineValue = useAtomValue(SheetMachineValueAtom);
+  const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
+  const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
 
   const { animatedIndex, animatedContentGestureState } =
     useBottomSheetInternal();

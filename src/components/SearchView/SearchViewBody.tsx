@@ -53,9 +53,10 @@ const SearchItem = (props: {
   title: string;
   description: string;
   icon: (typeof SearchItemIcons)[keyof typeof SearchItemIcons];
+  onPress?: () => void;
 }) => {
   return (
-    <TouchableOpacity style={styles.searchItem}>
+    <TouchableOpacity style={styles.searchItem} onPress={props.onPress}>
       {/* Placeholder icon */}
       {props.icon}
       <View style={styles.searchItemContent}>
@@ -95,7 +96,7 @@ export default function SearchViewBody(props: Props) {
     })),
 
     // Placeholder items
-    ...Array(15)
+    ...Array(debouncedSearchQuery.length)
       .fill(0)
       .map((item, index) => ({
         key: index.toString(),

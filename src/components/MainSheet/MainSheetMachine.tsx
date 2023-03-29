@@ -17,8 +17,8 @@ type Events =
       type: "FINISHED_TRANSITION";
     };
 
-export const sheetViewMachine = createMachine({
-  tsTypes: {} as import("./StateMachine.typegen").Typegen0,
+export const MainSheetMachine = createMachine({
+  tsTypes: {} as import("./MainSheetMachine.typegen").Typegen0,
   schema: {
     context: {} as Context,
     events: {} as Events,
@@ -57,9 +57,10 @@ export const sheetViewMachine = createMachine({
 });
 
 export type SheetViewMachineStates =
-  (typeof sheetViewMachine)["__TResolvedTypesMeta"]["resolved"]["matchesStates"];
+  (typeof MainSheetMachine)["__TResolvedTypesMeta"]["resolved"]["matchesStates"];
 
-export const SheetViewMachineAtom = atomWithMachine(sheetViewMachine);
-export const SheetMachineValueAtom = atom(
-  (get) => get(SheetViewMachineAtom).value
+export const MainSheetMachineAtom = atomWithMachine(MainSheetMachine);
+export const MainSheetMachineValueAtom = atom(
+  (get) => get(MainSheetMachineAtom).value
 );
+export const MainSheetActivatedAtom = atom(true);

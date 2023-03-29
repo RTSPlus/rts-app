@@ -16,8 +16,11 @@ import {
 } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
+import {
+  MainSheetMachineAtom,
+  SheetViewMachineStates,
+} from "./MainSheetMachine";
 import SearchBar from "./SearchBar";
-import { SheetViewMachineAtom, SheetViewMachineStates } from "./StateMachine";
 import { colors } from "../../colors";
 import HomeViewBody from "../HomeView/HomeViewBody";
 import SearchViewBody from "../SearchView/SearchViewBody";
@@ -26,7 +29,7 @@ import SearchViewBody from "../SearchView/SearchViewBody";
 
 export default function MainBottomSheet() {
   // #region State
-  const [sheetState, sheetSend] = useAtom(SheetViewMachineAtom);
+  const [sheetState, sheetSend] = useAtom(MainSheetMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
 
