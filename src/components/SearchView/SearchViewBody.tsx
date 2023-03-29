@@ -1,8 +1,12 @@
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { useQuery } from "@tanstack/react-query";
 import { Fragment } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
-import { colors } from "../../colors";
 import Icon from "react-native-vector-icons/FontAwesome";
+
+import { googleAutocomplete } from "./googleAutocompleteAPI";
+import { colors } from "../../colors";
+import useDebounce from "../../utils/useDebounce";
 
 const SearchItem = () => {
   return (
@@ -24,7 +28,7 @@ const SearchItem = () => {
   );
 };
 
-const GoogleAutocompleteSearchItem = (props: any) => {
+const GoogleAutocompleteSearchItem = (props: { description: string }) => {
   return (
     <TouchableOpacity style={styles.searchItem}>
       {/* Placeholder icon */}
@@ -41,14 +45,28 @@ const GoogleAutocompleteSearchItem = (props: any) => {
   );
 };
 
-export default function SearchViewBody(props: any) {
-  console.log("In search view body" + props.searchResults);
+type Props = {
+  searchQuery: string;
+};
+
+export default function SearchViewBody(props: Props) {
+  const debouncedSearchQuery = useDebounce(props.searchQuery, 200);
+
+  const { data: googleAutocompleteResults } = useQuery({
+    queryKey: ["googleAutocomplete", debouncedSearchQuery],
+    queryFn: () => googleAutocomplete(debouncedSearchQuery),
+    enabled: debouncedSearchQuery.length > 0,
+  });
+
   return (
     <>
       <View style={styles.topDivider} />
       <BottomSheetScrollView contentContainerStyle={styles.scrollView}>
-        {props.searchResults.map((item: { description: any }, index: any) => (
-          <GoogleAutocompleteSearchItem key={index} description={item} />
+        {googleAutocompleteResults?.map((item, index) => (
+          <GoogleAutocompleteSearchItem
+            key={index}
+            description={item.description}
+          />
         ))}
         {Array(15)
           .fill(0)
