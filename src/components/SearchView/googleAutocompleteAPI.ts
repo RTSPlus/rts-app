@@ -10,7 +10,6 @@ const PlacePredictionSchema = z.object({
     })
   ),
   place_id: z.string(),
-  reference: z.string(),
   structured_formatting: z.object({
     main_text: z.string(),
     main_text_matched_substrings: z.array(
