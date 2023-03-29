@@ -25,13 +25,16 @@ import SearchViewBody from "../SearchView/SearchViewBody";
 // #endregion
 
 export default function MainBottomSheet() {
-  // Hooks
+  // #region State
   const [sheetState, sheetSend] = useAtom(SheetViewMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = ["12.5%", "50%", "92%"];
-  const [searchResults, setSearchResults] = useState([]);
 
-  // Animation for body opacity
+  const [searchBarInput, setSearchBarInput] = useState("");
+
+  // #endregion
+
+  // #region Animation for body opacity
   const sheetAnimatedIndex = useSharedValue(1);
   const bodyOpacity = useDerivedValue(
     () =>
@@ -43,6 +46,7 @@ export default function MainBottomSheet() {
   const bodyAnimatedStyle = useAnimatedStyle(() => ({
     opacity: bodyOpacity.value,
   }));
+  // #endregion
 
   // Spring animation config
   const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
@@ -69,7 +73,7 @@ export default function MainBottomSheet() {
   const body = match(sheetState.value as SheetViewMachineStates)
     .with("home", () => <HomeViewBody />)
     .with("search", "transitioning_to_search", () => (
-      <SearchViewBody searchResults={searchResults} />
+      <SearchViewBody searchQuery={searchBarInput} />
     ))
     .exhaustive();
 
@@ -93,7 +97,7 @@ export default function MainBottomSheet() {
           }
         }}
       >
-        <SearchBar setSearchResults={setSearchResults} />
+        <SearchBar onChangeText={(text) => setSearchBarInput(text)} />
         {/* <HomeView /> */}
         <Reanimated.View
           style={[{ ...styles.bottomSheetBackgroundStyle }, bodyAnimatedStyle]}
