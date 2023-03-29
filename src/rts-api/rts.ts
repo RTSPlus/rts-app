@@ -4,7 +4,7 @@ import hmacSHA256 from "crypto-js/hmac-sha256";
 import { distVincenty } from "node-vincenty";
 
 import { PathPoint, PathStopPoint, Route, Pattern } from "./types";
-import { bisect_left } from "../utils";
+import { bisect_left } from "../utils/bisect";
 
 // Veryify that the environment variables are set
 if (!RTS_HASH_KEY || !RTS_API_KEY) {

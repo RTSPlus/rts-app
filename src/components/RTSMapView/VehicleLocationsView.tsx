@@ -9,7 +9,7 @@ import { useVehicleLocations } from "./useVehicleLocations";
 import { useAvailableRoutes } from "../../api-controller/useAvailableRoutes";
 import { getRoutePattern } from "../../rts-api/rts";
 import { Pattern } from "../../rts-api/types";
-import { feetToMeters } from "../../utils";
+import { feetToMeters } from "../../utils/utils";
 // #\\endregion
 
 type Props = {

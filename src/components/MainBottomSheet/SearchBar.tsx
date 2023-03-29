@@ -20,7 +20,7 @@ import {
   SheetViewMachineStates,
 } from "./StateMachine";
 import { colors } from "../../colors";
-import { AppleEasing } from "../../utils";
+import { AppleEasing } from "../../utils/easing";
 
 type Props = {
   onChangeText?: (text: string) => void;
