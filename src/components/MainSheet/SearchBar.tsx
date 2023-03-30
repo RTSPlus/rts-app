@@ -34,14 +34,15 @@ export default function SearchBar(props: Props) {
   const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
   const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
 
-  const { animatedIndex, animatedContentGestureState } =
-    useBottomSheetInternal();
+  const { animatedContentGestureState } = useBottomSheetInternal();
 
   const rightIconWidthAnim = useRef(new Animated.Value(48)).current;
   // #endregion
 
   // #region Handles
   const onCancel = () => {
+    props.onChangeText?.("");
+    searchInputRef.current?.clear();
     searchInputRef.current?.blur();
     sheetMachineSend("EXIT_SEARCH");
   };
@@ -83,35 +84,17 @@ export default function SearchBar(props: Props) {
       .exhaustive();
   }, [sheetMachineValue, rightIconWidthAnim]);
 
-  // Handle sheet transition
+  // Blur keyboard when we begin to swipe down
   useAnimatedReaction(
     () => ({
-      index: animatedIndex.value,
       gestureState: animatedContentGestureState.value,
     }),
-    ({ index, gestureState }) => {
-      if (sheetMachineValue === "transitioning_to_search") {
-        // Render the bottom sheet un-interactive when we are transitioning to the search view
-        // to prevent weird bugs/behaviors. Necessary to feel more natural
-        if (index >= 1.95) {
-          runOnJS(sheetMachineSend)("FINISHED_TRANSITION");
-        }
-      } else if (sheetMachineValue === "search") {
-        // Blur keyboard when we being to swipe down
-        if (gestureState === State.ACTIVE) {
-          runOnJS(blurSearchInput)();
-        }
-
-        // This is required because for some reason, `onAnimate` in the BottomSheet prop will not
-        // fire when the sheet is transitioning from the search view to the home view
-        // However, that event transition should be preferred as it runs faster
-        // This is a backup in case that event transition fails
-        if (index <= 1) {
-          runOnJS(sheetMachineSend)("EXIT_SEARCH");
-        }
+    ({ gestureState }) => {
+      if (sheetMachineValue === "search" && gestureState === State.ACTIVE) {
+        runOnJS(blurSearchInput)();
       }
     },
-    [sheetMachineValue, sheetMachineSend, blurSearchInput]
+    [sheetMachineValue, blurSearchInput]
   );
   // #endregion
 

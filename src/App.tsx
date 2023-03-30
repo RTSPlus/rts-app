@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
@@ -15,6 +16,7 @@ import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
 import MainSheet from "./components/MainSheet/MainSheet";
 import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
+import ModalController from "./components/modals/ModalController";
 
 LogBox.ignoreLogs([
   "setNativeProps is deprecated and will be removed in next major release",
@@ -24,7 +26,9 @@ const Providers = (props: PropsWithChildren) => {
   return (
     <SafeAreaProvider>
       <ControllerProvider>
-        <NativeBaseProvider>{props.children}</NativeBaseProvider>
+        <BottomSheetModalProvider>
+          <NativeBaseProvider>{props.children}</NativeBaseProvider>
+        </BottomSheetModalProvider>
       </ControllerProvider>
     </SafeAreaProvider>
   );
@@ -71,6 +75,7 @@ function App() {
         <RTSMapView style={styles.map} />
         <StatusBarBlurry />
         <MainSheet />
+        <ModalController />
       </View>
     </Providers>
   );

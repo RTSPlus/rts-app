@@ -7,6 +7,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 import { googleAutocomplete } from "./googleAutocompleteAPI";
 import { colors } from "../../../colors";
 import useDebounce from "../../../utils/useDebounce";
+import { dispatch as modalControllerDispatch } from "../../modals/ModalController";
 
 const SearchItemIcons = {
   LOCATION: (
@@ -106,6 +107,12 @@ export default function SearchViewBody(props: Props) {
             title="Title"
             description="description"
             icon={SearchItemIcons.PLACEHOLDER}
+            onPress={() => {
+              modalControllerDispatch({
+                event: "OPEN_DESTINATION",
+                payload: "test",
+              });
+            }}
           />
         ),
       })),

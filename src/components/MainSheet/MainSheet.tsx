@@ -1,37 +1,83 @@
 // #region Imports
 import BottomSheet, {
   BottomSheetBackdrop,
+  useBottomSheetInternal,
   useBottomSheetSpringConfigs,
 } from "@gorhom/bottom-sheet";
-import { useAtom } from "jotai";
-import React, { ComponentProps, useCallback, useRef, useState } from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import React, {
+  ComponentProps,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, View } from "react-native";
 import {
   default as Reanimated,
   Extrapolation,
   interpolate,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
 } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
+import HomeViewBody from "./HomeView/HomeViewBody";
 import {
   MainSheetMachineAtom,
+  MainSheetMachineValueAtom,
   SheetViewMachineStates,
 } from "./MainSheetMachine";
 import SearchBar from "./SearchBar";
-import { colors } from "../../colors";
-import HomeViewBody from "./HomeView/HomeViewBody";
 import SearchViewBody from "./SearchView/SearchViewBody";
+import { colors } from "../../colors";
+import { SHEET_SNAP_POINTS } from "../../utils/utils";
+import { ModalCounterAtom } from "../modals/ModalController";
 
 // #endregion
+
+const SheetTransitionHandler = () => {
+  const { animatedIndex, animatedContentGestureState } =
+    useBottomSheetInternal();
+
+  // Very marginal? possible render optimization by using derived read-only atoms
+  const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
+  const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
+
+  // Render sheet in-active when another modal is active
+  const isSheetActive = useAtomValue(ModalCounterAtom) === 0;
+  // Handle sheet transition
+  useAnimatedReaction(
+    () => ({
+      index: animatedIndex.value,
+      gestureState: animatedContentGestureState.value,
+    }),
+    ({ index, gestureState }) => {
+      if (sheetMachineValue === "transitioning_to_search") {
+        // Render the bottom sheet un-interactive when we are transitioning to the search view
+        // to prevent weird bugs/behaviors. Necessary to feel more natural
+        if (index >= 1.95) runOnJS(sheetMachineSend)("FINISHED_TRANSITION");
+      } else if (sheetMachineValue === "search" && isSheetActive) {
+        // This is required because for some reason, `onAnimate` in the BottomSheet prop will not
+        // fire when the sheet is transitioning from the search view to the home view
+        // However, that event transition should be preferred as it runs faster
+        // This is a backup in case that event transition fails
+        if (index <= 1) runOnJS(sheetMachineSend)("EXIT_SEARCH");
+      }
+    },
+    [sheetMachineValue, sheetMachineSend, isSheetActive]
+  );
+
+  return <></>;
+};
 
 export default function MainBottomSheet() {
   // #region State
   const [sheetState, sheetSend] = useAtom(MainSheetMachineAtom);
   const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = ["12.5%", "50%", "92%"];
 
   const [searchBarInput, setSearchBarInput] = useState("");
 
@@ -60,6 +106,7 @@ export default function MainBottomSheet() {
     stiffness: 500,
   });
 
+  // Honestly idk why this needs to be wrapped in a useCallback. That's the example from the docs
   const BackdropComponent = useCallback(
     (props: ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop
@@ -80,12 +127,21 @@ export default function MainBottomSheet() {
     ))
     .exhaustive();
 
+  // In-activate sheet when another modal is active
+  const isSheetActive = useAtomValue(ModalCounterAtom) <= 0;
+
+  useEffect(() => {
+    if (!isSheetActive) {
+      sheetRef.current?.close();
+    }
+  }, [isSheetActive]);
+
   return (
     <>
       <BottomSheet
         ref={sheetRef}
         index={sheetState.context.sheetIndex}
-        snapPoints={snapPoints}
+        snapPoints={SHEET_SNAP_POINTS}
         style={styles.bottomSheet}
         handleStyle={styles.bottomSheetHandle}
         handleIndicatorStyle={styles.bottomSheetHandleIndicator}
@@ -95,11 +151,14 @@ export default function MainBottomSheet() {
         enablePanDownToClose={false}
         animatedIndex={sheetAnimatedIndex}
         onAnimate={(from) => {
-          if (sheetState.value === "search" && from === 2) {
-            sheetSend("EXIT_SEARCH");
+          if (isSheetActive) {
+            if (sheetState.value === "search" && from === 2) {
+              sheetSend("EXIT_SEARCH");
+            }
           }
         }}
       >
+        <SheetTransitionHandler />
         <SearchBar onChangeText={(text) => setSearchBarInput(text)} />
         {/* <HomeView /> */}
         <Reanimated.View
