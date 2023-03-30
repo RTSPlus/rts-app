@@ -40,8 +40,7 @@ import { ModalCounterAtom } from "../modals/ModalController";
 // #endregion
 
 const SheetTransitionHandler = () => {
-  const { animatedIndex, animatedContentGestureState } =
-    useBottomSheetInternal();
+  const { animatedIndex } = useBottomSheetInternal();
 
   // Very marginal? possible render optimization by using derived read-only atoms
   const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
@@ -53,9 +52,8 @@ const SheetTransitionHandler = () => {
   useAnimatedReaction(
     () => ({
       index: animatedIndex.value,
-      gestureState: animatedContentGestureState.value,
     }),
-    ({ index, gestureState }) => {
+    ({ index }) => {
       if (sheetMachineValue === "transitioning_to_search") {
         // Render the bottom sheet un-interactive when we are transitioning to the search view
         // to prevent weird bugs/behaviors. Necessary to feel more natural
@@ -80,7 +78,6 @@ export default function MainBottomSheet() {
   const sheetRef = useRef<BottomSheet>(null);
 
   const [searchBarInput, setSearchBarInput] = useState("");
-
   // #endregion
 
   // #region Animation for body opacity

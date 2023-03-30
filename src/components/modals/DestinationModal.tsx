@@ -1,6 +1,7 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
-import { Button, Text } from "react-native";
+import { Button, Text, StyleSheet } from "react-native";
+import { colors } from "../../colors";
 
 import { SHEET_SNAP_POINTS } from "../../utils/utils";
 import type { ModalControllerDispatchEvent } from "../modals/ModalController";
@@ -43,6 +44,11 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         ref={bottomSheetModalRef}
         index={1}
         snapPoints={SHEET_SNAP_POINTS}
+        style={styles.bottomSheet}
+        handleStyle={styles.bottomSheetHandle}
+        handleIndicatorStyle={styles.bottomSheetHandleIndicator}
+        backgroundStyle={styles.bottomSheetBackgroundStyle}
+        //
         // This is weird because the bottom sheet can be dismissed by swiping down
         // and we need to dispatch the state change. But we also want to close the
         // modal when the user presses the close button and that requires an alternate dispatch
@@ -75,5 +81,36 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     );
   }
 );
+
+const styles = StyleSheet.create({
+  bottomSheetHandle: {
+    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  bottomSheetHandleIndicator: {
+    backgroundColor: colors.ios.light.gray["2"].toRgbString(),
+  },
+  bottomSheetBackgroundStyle: {
+    flex: 1,
+    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+  },
+  bottomSheet: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
+  },
+  bottomSheetContent: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default DestinationModal;
