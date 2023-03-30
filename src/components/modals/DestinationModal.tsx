@@ -1,12 +1,21 @@
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Button, Text, StyleSheet } from "react-native";
+
 import { colors } from "../../colors";
 
 import { SHEET_SNAP_POINTS } from "../../utils/utils";
 import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 
-export type DestinationModalOpenPayload = {};
+export type DestinationModalOpenPayload = {
+  title: string;
+};
 
 export type DestinationModalRef = {
   open: (payload: DestinationModalOpenPayload) => void;
@@ -18,6 +27,8 @@ type Props = {
 
 const DestinationModal = forwardRef<DestinationModalRef, Props>(
   (props, ref) => {
+    const [destinationInfo, setDestionationInfo] = useState({ title: "yuh" });
+
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // This is weird and needs to be a ref for the onDismiss prop
@@ -28,7 +39,9 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       bottomSheetModalRef.current?.present();
       isOpen.current = true;
 
-      console.log(payload);
+      setDestionationInfo({
+        title: payload.title,
+      });
     }, []);
 
     useImperativeHandle(
@@ -66,7 +79,7 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
           }
         }}
       >
-        <Text>Yuh</Text>
+        <Text>{destinationInfo.title}</Text>
         <Button
           title="close"
           onPress={() => {

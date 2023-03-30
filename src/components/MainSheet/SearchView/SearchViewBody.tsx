@@ -75,12 +75,12 @@ type Props = {
 export default function SearchViewBody(props: Props) {
   const debouncedSearchQuery = useDebounce(props.searchQuery, 200);
 
-  const googleAutocompleteResults = [];
-  // const { data: googleAutocompleteResults } = useQuery({
-  //   queryKey: ["googleAutocomplete", debouncedSearchQuery],
-  //   queryFn: () => googleAutocomplete(debouncedSearchQuery),
-  //   enabled: debouncedSearchQuery.length > 0,
-  // });
+  // const googleAutocompleteResults = [];
+  const { data: googleAutocompleteResults } = useQuery({
+    queryKey: ["googleAutocomplete", debouncedSearchQuery],
+    queryFn: () => googleAutocomplete(debouncedSearchQuery),
+    enabled: debouncedSearchQuery.length > 0,
+  });
 
   const results: { item: JSX.Element; key: string }[] = [
     // Google autocomplete items
@@ -93,6 +93,14 @@ export default function SearchViewBody(props: Props) {
             item.terms[2]?.value ?? "empty"
           }`}
           icon={SearchItemIcons.LOCATION}
+          onPress={() => {
+            modalControllerDispatch({
+              event: "OPEN_DESTINATION",
+              payload: {
+                title: item.terms[0].value,
+              },
+            });
+          }}
         />
       ),
     })),
@@ -110,7 +118,9 @@ export default function SearchViewBody(props: Props) {
             onPress={() => {
               modalControllerDispatch({
                 event: "OPEN_DESTINATION",
-                payload: "test",
+                payload: {
+                  title: "Test",
+                },
               });
             }}
           />
