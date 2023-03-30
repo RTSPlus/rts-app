@@ -22,8 +22,8 @@ import {
 } from "./MainSheetMachine";
 import SearchBar from "./SearchBar";
 import { colors } from "../../colors";
-import HomeViewBody from "../HomeView/HomeViewBody";
-import SearchViewBody from "../SearchView/SearchViewBody";
+import HomeViewBody from "./HomeView/HomeViewBody";
+import SearchViewBody from "./SearchView/SearchViewBody";
 
 // #endregion
 

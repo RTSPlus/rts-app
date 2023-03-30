@@ -2,7 +2,7 @@ import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Box, HStack } from "native-base";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import CustomRouteIcon from "../CustomRouteIcon";
+import CustomRouteIcon from "../../CustomRouteIcon";
 
 export default function HomeViewBody() {
   return (

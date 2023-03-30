@@ -19,12 +19,12 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { RTS_GOOGLE_API_KEY } from "@env";
 import { Dimensions } from "react-native";
-import AllRoutesView from "../AllRoutesView";
-import BusInformationView from "../BusInformationView";
-import CustomBusIcon from "../CustomBusIcon";
-import FavoritesView from "../FavoritesView";
-import CustomRouteIcon from "../CustomRouteIcon";
-import DetailedRouteView from "../DetailedRouteView";
+import AllRoutesView from "../../AllRoutesView";
+import BusInformationView from "../../BusInformationView";
+import CustomBusIcon from "../../CustomBusIcon";
+import FavoritesView from "../../FavoritesView";
+import CustomRouteIcon from "../../CustomRouteIcon";
+import DetailedRouteView from "../../DetailedRouteView";
 import { FlatList } from "react-native";
 
 const BusDirections = ({ directions }: { directions: any }) => {

@@ -23,7 +23,7 @@ export const MainSheetMachine = createMachine({
     context: {} as Context,
     events: {} as Events,
   },
-  id: "sheetViewMachine",
+  id: "mainSheetMachine",
   initial: "home",
   context: {
     sheetIndex: 1,

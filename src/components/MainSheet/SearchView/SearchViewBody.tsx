@@ -5,8 +5,8 @@ import { Fragment } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 
 import { googleAutocomplete } from "./googleAutocompleteAPI";
-import { colors } from "../../colors";
-import useDebounce from "../../utils/useDebounce";
+import { colors } from "../../../colors";
+import useDebounce from "../../../utils/useDebounce";
 
 const SearchItemIcons = {
   LOCATION: (
@@ -74,11 +74,12 @@ type Props = {
 export default function SearchViewBody(props: Props) {
   const debouncedSearchQuery = useDebounce(props.searchQuery, 200);
 
-  const { data: googleAutocompleteResults } = useQuery({
-    queryKey: ["googleAutocomplete", debouncedSearchQuery],
-    queryFn: () => googleAutocomplete(debouncedSearchQuery),
-    enabled: debouncedSearchQuery.length > 0,
-  });
+  const googleAutocompleteResults = [];
+  // const { data: googleAutocompleteResults } = useQuery({
+  //   queryKey: ["googleAutocomplete", debouncedSearchQuery],
+  //   queryFn: () => googleAutocomplete(debouncedSearchQuery),
+  //   enabled: debouncedSearchQuery.length > 0,
+  // });
 
   const results: { item: JSX.Element; key: string }[] = [
     // Google autocomplete items
