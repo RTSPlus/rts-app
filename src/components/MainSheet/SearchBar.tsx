@@ -111,7 +111,7 @@ export default function SearchBar(props: Props) {
             style={styles.searchBarIcon}
             name="ios-search-outline"
             size={20}
-            color={colors.ios.light.gray["1"].clone().darken().toRgbString()}
+            color={colors.ios.light.gray["1"].darken().toRgbString()}
           />
           <TextInput
             onChangeText={props.onChangeText}
@@ -119,8 +119,7 @@ export default function SearchBar(props: Props) {
             style={styles.searchBarInput}
             placeholder="Search routes, stops, & places"
             placeholderTextColor={colors.ios.light.gray["1"]
-              .clone()
-              .darken()
+              .setAlpha(0.5)
               .toRgbString()}
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
           />
