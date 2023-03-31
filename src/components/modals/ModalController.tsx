@@ -6,6 +6,7 @@ import DestinationModal, {
   DestinationModalOpenPayload,
   DestinationModalRef,
 } from "./DestinationModal";
+import RouteModal, { RouteModalOpenPayload, RouteModalRef } from "./RouteModal";
 
 /**
  * BIG WARNING TODO:
@@ -24,7 +25,10 @@ export type ModalControllerDispatchEvent =
     }
   | {
       event: "OPEN_ROUTE";
-      payload: any;
+      payload: RouteModalOpenPayload;
+    }
+  | {
+      event: "CLOSE_ROUTE";
     };
 
 /**
@@ -44,6 +48,8 @@ export const ModalCounterAtom = atom(0);
 
 export default function ModalController() {
   const destinationModalRef = useRef<DestinationModalRef>(null);
+  const routeModalRef = useRef<RouteModalRef>(null);
+
   const setModalCounter = useSetAtom(ModalCounterAtom);
 
   useEffect(() => {
@@ -53,10 +59,13 @@ export default function ModalController() {
           destinationModalRef.current?.open(payload);
           setModalCounter((prev) => prev + 1);
         })
-        .with({ event: "CLOSE_DESTINATION" }, () => {
+        .with({ event: "OPEN_ROUTE" }, ({ payload }) => {
+          routeModalRef.current?.open(payload);
+          setModalCounter((prev) => prev + 1);
+        })
+        .with({ event: "CLOSE_DESTINATION" }, { event: "CLOSE_ROUTE" }, () => {
           setModalCounter((prev) => prev - 1);
         })
-        .with({ event: "OPEN_ROUTE" }, () => {})
         .exhaustive();
     };
 
@@ -71,6 +80,7 @@ export default function ModalController() {
         ref={destinationModalRef}
         modalControllerDispatch={dispatch}
       />
+      <RouteModal ref={routeModalRef} modalControllerDispatch={dispatch} />
     </>
   );
 }
