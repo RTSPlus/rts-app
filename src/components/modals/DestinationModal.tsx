@@ -1,4 +1,7 @@
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetModal,
+  useBottomSheetSpringConfigs,
+} from "@gorhom/bottom-sheet";
 import {
   forwardRef,
   useCallback,
@@ -9,7 +12,6 @@ import {
 import { Button, Text, StyleSheet } from "react-native";
 
 import { colors } from "../../colors";
-
 import { SHEET_SNAP_POINTS } from "../../utils/utils";
 import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 
@@ -30,6 +32,15 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     const [destinationInfo, setDestionationInfo] = useState({ title: "yuh" });
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+    // Spring animation config
+    const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
+      damping: 40,
+      overshootClamping: true,
+      restDisplacementThreshold: 0.1,
+      restSpeedThreshold: 0.1,
+      stiffness: 500,
+    });
 
     // This is weird and needs to be a ref for the onDismiss prop
     // See note above the prop
@@ -61,6 +72,7 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         handleStyle={styles.bottomSheetHandle}
         handleIndicatorStyle={styles.bottomSheetHandleIndicator}
         backgroundStyle={styles.bottomSheetBackgroundStyle}
+        animationConfigs={bottomSheetAnimationConfigs}
         //
         // This is weird because the bottom sheet can be dismissed by swiping down
         // and we need to dispatch the state change. But we also want to close the
