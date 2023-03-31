@@ -13,16 +13,7 @@ import React, {
   useState,
 } from "react";
 import { StyleSheet, View } from "react-native";
-import {
-  default as Reanimated,
-  Extrapolation,
-  interpolate,
-  runOnJS,
-  useAnimatedReaction,
-  useAnimatedStyle,
-  useDerivedValue,
-  useSharedValue,
-} from "react-native-reanimated";
+import { runOnJS, useAnimatedReaction } from "react-native-reanimated";
 import { match } from "ts-pattern";
 
 import HomeViewBody from "./HomeView/HomeViewBody";
@@ -47,7 +38,8 @@ const SheetTransitionHandler = () => {
   const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
 
   // Render sheet in-active when another modal is active
-  const isSheetActive = useAtomValue(ModalCounterAtom) === 0;
+  const isSheetActive = useAtomValue(ModalCounterAtom) <= 0;
+
   // Handle sheet transition
   useAnimatedReaction(
     () => ({
@@ -78,20 +70,6 @@ export default function MainBottomSheet() {
   const sheetRef = useRef<BottomSheet>(null);
 
   const [searchBarInput, setSearchBarInput] = useState("");
-  // #endregion
-
-  // #region Animation for body opacity
-  const sheetAnimatedIndex = useSharedValue(1);
-  const bodyOpacity = useDerivedValue(
-    () =>
-      interpolate(sheetAnimatedIndex.value, [0, 0.2], [0, 1], {
-        extrapolateRight: Extrapolation.CLAMP,
-      }),
-    []
-  );
-  const bodyAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: bodyOpacity.value,
-  }));
   // #endregion
 
   // Spring animation config
@@ -146,7 +124,6 @@ export default function MainBottomSheet() {
         animationConfigs={bottomSheetAnimationConfigs}
         backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
-        animatedIndex={sheetAnimatedIndex}
         onAnimate={(from) => {
           if (isSheetActive) {
             if (sheetState.value === "search" && from === 2) {
@@ -158,11 +135,7 @@ export default function MainBottomSheet() {
         <SheetTransitionHandler />
         <SearchBar onChangeText={(text) => setSearchBarInput(text)} />
         {/* <HomeView /> */}
-        <Reanimated.View
-          style={[{ ...styles.bottomSheetBackgroundStyle }, bodyAnimatedStyle]}
-        >
-          {body}
-        </Reanimated.View>
+        <View style={styles.bottomSheetBackgroundStyle}>{body}</View>
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
       {sheetState.value === "transitioning_to_search" && (
@@ -175,6 +148,7 @@ export default function MainBottomSheet() {
 const styles = StyleSheet.create({
   bottomSheetHandle: {
     backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+    // backgroundColor: colors.ios.light.gray["6"].toRgbString(),
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
@@ -183,7 +157,8 @@ const styles = StyleSheet.create({
   },
   bottomSheetBackgroundStyle: {
     flex: 1,
-    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+    // backgroundColor: colors.ios.light.gray["6"].toRgbString(),
+    backgroundColor: "#F6F7F5",
   },
   bottomSheet: {
     shadowColor: "#000",
