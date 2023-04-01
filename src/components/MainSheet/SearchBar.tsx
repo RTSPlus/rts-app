@@ -20,6 +20,7 @@ import {
 } from "./MainSheetMachine";
 import { colors } from "../../colors";
 import { AppleEasing } from "../../utils/easing";
+import { dispatch } from "../modals/ModalController";
 
 type Props = {
   onChangeText?: (text: string) => void;
@@ -128,13 +129,13 @@ export default function SearchBar(props: Props) {
           width: 36,
           height: 36,
           borderRadius: 18,
-          // backgroundColor: colors.ios.light.gray["4"].toRgbString(),
           borderColor: colors.ios.light.gray["1"].toString(),
           borderWidth: 2,
           marginLeft: 16,
           justifyContent: "center",
           alignItems: "center",
         }}
+        onPress={() => dispatch({ event: "OPEN_MAP_OPTIONS" })}
       >
         <Ionicons
           name="ios-map"
