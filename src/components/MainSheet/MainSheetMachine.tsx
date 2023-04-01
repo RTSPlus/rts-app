@@ -61,6 +61,6 @@ export type SheetViewMachineStates =
 
 export const MainSheetMachineAtom = atomWithMachine(MainSheetMachine);
 export const MainSheetMachineValueAtom = atom(
-  (get) => get(MainSheetMachineAtom).value
+  (get) => get(MainSheetMachineAtom).value as SheetViewMachineStates
 );
 export const MainSheetActivatedAtom = atom(true);

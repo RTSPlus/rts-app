@@ -5,5 +5,3 @@ export function metersToFeet(meters: number) {
 export function feetToMeters(feet: number) {
   return feet * 0.3048;
 }
-
-export const SHEET_SNAP_POINTS = ["12.5%", "50%", "92%"];

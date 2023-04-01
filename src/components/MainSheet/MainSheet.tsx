@@ -24,8 +24,11 @@ import {
 } from "./MainSheetMachine";
 import SearchBar from "./SearchBar";
 import SearchViewBody from "./SearchView/SearchViewBody";
-import { sheetAnimationConfig, sheetStyles } from "../../utils/sheetConfig";
-import { SHEET_SNAP_POINTS } from "../../utils/utils";
+import {
+  sheetAnimationConfig,
+  sheetStyles,
+  SHEET_SNAP_POINTS,
+} from "../../utils/sheetConfig";
 import { ModalCounterAtom } from "../modals/ModalController";
 
 // #endregion
@@ -99,7 +102,6 @@ export default function MainBottomSheet() {
 
   // De-activate sheet when another modal is active
   const isSheetActive = useAtomValue(ModalCounterAtom) <= 0;
-
   useEffect(() => {
     if (!isSheetActive) {
       sheetRef.current?.close();

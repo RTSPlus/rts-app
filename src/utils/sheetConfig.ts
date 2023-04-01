@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 
 import { colors } from "../colors";
 
+export const SHEET_SNAP_POINTS = ["12.5%", "50%", "92%"];
+
 export const sheetAnimationConfig: Parameters<
   typeof useBottomSheetSpringConfigs
 >[0] = {
