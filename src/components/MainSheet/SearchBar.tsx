@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useBottomSheetInternal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { useSetAtom, useAtomValue } from "jotai";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   TextInput,
   View,
@@ -29,6 +29,7 @@ type Props = {
 export default function SearchBar(props: Props) {
   // #region State
   const searchInputRef = useRef<TextInput>(null);
+  const [searchInputText, setSearchInputText] = useState("");
 
   const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
   const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
@@ -39,9 +40,15 @@ export default function SearchBar(props: Props) {
   // #endregion
 
   // #region Handles
+  const onSearchInputChangeText = (text: string) => {
+    setSearchInputText(text);
+    props.onChangeText?.(text);
+  };
+
   const onCancel = () => {
     props.onChangeText?.("");
-    searchInputRef.current?.clear();
+    setSearchInputText("");
+
     searchInputRef.current?.blur();
     sheetMachineSend("EXIT_SEARCH");
   };
@@ -76,7 +83,7 @@ export default function SearchBar(props: Props) {
       })
       .with("transitioning_to_search", "search", () => {
         Animated.timing(rightIconWidthAnim, {
-          toValue: 72,
+          toValue: 68,
           ...timingConfig,
         }).start();
       })
@@ -105,7 +112,6 @@ export default function SearchBar(props: Props) {
       // Cancel button
       <TouchableOpacity
         style={{
-          marginLeft: 16,
           position: "relative",
           alignItems: "center",
         }}
@@ -114,8 +120,8 @@ export default function SearchBar(props: Props) {
         <Text
           style={{
             color: colors.ios.light.blue.toRgbString(),
-            fontSize: 18,
-            width: 56,
+            fontSize: 17,
+            width: 53,
           }}
         >
           Cancel
@@ -162,7 +168,8 @@ export default function SearchBar(props: Props) {
             color={colors.ios.light.gray["1"].darken().toRgbString()}
           />
           <TextInput
-            onChangeText={props.onChangeText}
+            onChangeText={onSearchInputChangeText}
+            value={searchInputText}
             ref={searchInputRef}
             style={styles.searchBarInput}
             placeholder="Search routes, stops, & places"
@@ -171,6 +178,16 @@ export default function SearchBar(props: Props) {
               .toRgbString()}
             onFocus={() => sheetMachineSend("FOCUS_SEARCH")}
           />
+          {searchInputText.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchInputText("")}>
+              <Ionicons
+                style={styles.searchBarIcon}
+                name="ios-close-circle"
+                size={20}
+                color={colors.ios.light.gray["1"].darken().toRgbString()}
+              />
+            </TouchableOpacity>
+          )}
         </BottomSheetView>
         {/* Right icon */}
         <Animated.View
@@ -198,7 +215,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.ios.light.gray["5"].toRgbString(),
     borderRadius: 8,
     height: 36,
-    paddingHorizontal: 4,
+    paddingLeft: 4,
+    paddingRight: 0,
   },
   searchBarIcon: {
     marginRight: 6,
