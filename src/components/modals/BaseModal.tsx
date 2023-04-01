@@ -10,10 +10,9 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import { Button, TouchableOpacity, View } from "react-native";
-import { TouchableHighlight } from "react-native-gesture-handler";
-import { colors } from "../../colors";
+import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
+import { colors } from "../../colors";
 import {
   sheetAnimationConfig,
   sheetStyles,
@@ -21,6 +20,7 @@ import {
 } from "../../utils/sheetConfig";
 
 type BaseModalProps = {
+  titleText?: string;
   onClose?: () => void;
 };
 
@@ -79,38 +79,52 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
           }
         }}
       >
+        <View style={styles.topRow}>
+          <Text style={styles.title}>{props.titleText ?? ""}</Text>
+          <TouchableOpacity
+            hitSlop={10}
+            activeOpacity={0.5}
+            style={styles.closeBtn}
+            onPress={() => {
+              isOpen.current = false;
+              props.onClose?.();
+              modalRef.current?.dismiss();
+            }}
+          >
+            <Ionicons
+              name="ios-close"
+              size={24}
+              color={colors.ios.light.gray["1"].darken().toRgbString()}
+              style={{ transform: [{ translateX: 0.5 }] }}
+            />
+          </TouchableOpacity>
+        </View>
         {props.children}
-        <TouchableOpacity
-          hitSlop={10}
-          activeOpacity={0.5}
-          style={{
-            position: "absolute",
-            right: 16,
-            backgroundColor: colors.ios.light.gray["4"]
-              .setAlpha(0.5)
-              .toRgbString(),
-            borderRadius: 14,
-            width: 28,
-            height: 28,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={() => {
-            isOpen.current = false;
-            props.onClose?.();
-            modalRef.current?.dismiss();
-          }}
-        >
-          <Ionicons
-            name="ios-close"
-            size={24}
-            color={colors.ios.light.gray["1"].darken().toRgbString()}
-            style={{ transform: [{ translateX: 0.5 }] }}
-          />
-        </TouchableOpacity>
       </BottomSheetModal>
     );
   }
 );
+
+const styles = StyleSheet.create({
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 0,
+  },
+  closeBtn: {
+    backgroundColor: colors.ios.light.gray["4"].setAlpha(0.5).toRgbString(),
+    borderRadius: 14,
+    width: 28,
+    height: 28,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
 
 export default BaseModal;

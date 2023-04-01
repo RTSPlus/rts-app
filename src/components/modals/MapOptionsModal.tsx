@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
@@ -29,6 +29,7 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
 
   return (
     <BaseModal
+      titleText="Your Map"
       ref={baseModalRef}
       onClose={() =>
         props.modalControllerDispatch({
@@ -36,7 +37,7 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
         })
       }
     >
-      <Text>Map options</Text>
+      <View style={{ paddingHorizontal: 16 }}></View>
     </BaseModal>
   );
 });
