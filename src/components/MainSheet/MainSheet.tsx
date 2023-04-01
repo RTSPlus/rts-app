@@ -24,7 +24,7 @@ import {
 } from "./MainSheetMachine";
 import SearchBar from "./SearchBar";
 import SearchViewBody from "./SearchView/SearchViewBody";
-import { colors } from "../../colors";
+import { sheetAnimationConfig, sheetStyles } from "../../utils/sheetConfig";
 import { SHEET_SNAP_POINTS } from "../../utils/utils";
 import { ModalCounterAtom } from "../modals/ModalController";
 
@@ -73,13 +73,8 @@ export default function MainBottomSheet() {
   // #endregion
 
   // Spring animation config
-  const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
-    damping: 40,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.1,
-    restSpeedThreshold: 0.1,
-    stiffness: 500,
-  });
+  const bottomSheetAnimationConfigs =
+    useBottomSheetSpringConfigs(sheetAnimationConfig);
 
   // Honestly idk why this needs to be wrapped in a useCallback. That's the example from the docs
   const BackdropComponent = useCallback(
@@ -102,7 +97,7 @@ export default function MainBottomSheet() {
     ))
     .exhaustive();
 
-  // In-activate sheet when another modal is active
+  // De-activate sheet when another modal is active
   const isSheetActive = useAtomValue(ModalCounterAtom) <= 0;
 
   useEffect(() => {
@@ -117,10 +112,10 @@ export default function MainBottomSheet() {
         ref={sheetRef}
         index={sheetState.context.sheetIndex}
         snapPoints={SHEET_SNAP_POINTS}
-        style={styles.bottomSheet}
-        handleStyle={styles.bottomSheetHandle}
-        handleIndicatorStyle={styles.bottomSheetHandleIndicator}
-        backgroundStyle={styles.bottomSheetBackgroundStyle}
+        style={sheetStyles.bottomSheet}
+        handleStyle={sheetStyles.bottomSheetHandle}
+        handleIndicatorStyle={sheetStyles.bottomSheetHandleIndicator}
+        backgroundStyle={sheetStyles.bottomSheetBackgroundStyle}
         animationConfigs={bottomSheetAnimationConfigs}
         backdropComponent={BackdropComponent}
         enablePanDownToClose={false}
@@ -134,8 +129,7 @@ export default function MainBottomSheet() {
       >
         <SheetTransitionHandler />
         <SearchBar onChangeText={(text) => setSearchBarInput(text)} />
-        {/* <HomeView /> */}
-        <View style={styles.bottomSheetBackgroundStyle}>{body}</View>
+        <View style={sheetStyles.bottomSheetBackgroundStyle}>{body}</View>
       </BottomSheet>
       {/* Invisible box filling to whole screen that renders the sheet inactive during transition */}
       {sheetState.value === "transitioning_to_search" && (
@@ -144,36 +138,3 @@ export default function MainBottomSheet() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  bottomSheetHandle: {
-    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
-    // backgroundColor: colors.ios.light.gray["6"].toRgbString(),
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  bottomSheetHandleIndicator: {
-    backgroundColor: colors.ios.light.gray["2"].toRgbString(),
-  },
-  bottomSheetBackgroundStyle: {
-    flex: 1,
-    // backgroundColor: colors.ios.light.gray["6"].toRgbString(),
-    backgroundColor: "#F6F7F5",
-  },
-  bottomSheet: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
-  },
-  bottomSheetContent: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

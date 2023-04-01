@@ -9,9 +9,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button, Text, StyleSheet } from "react-native";
+import { Button, Text } from "react-native";
 
-import { colors } from "../../colors";
+import { sheetAnimationConfig, sheetStyles } from "../../utils/sheetConfig";
 import { SHEET_SNAP_POINTS } from "../../utils/utils";
 import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 
@@ -34,13 +34,8 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     // Spring animation config
-    const bottomSheetAnimationConfigs = useBottomSheetSpringConfigs({
-      damping: 40,
-      overshootClamping: true,
-      restDisplacementThreshold: 0.1,
-      restSpeedThreshold: 0.1,
-      stiffness: 500,
-    });
+    const bottomSheetAnimationConfigs =
+      useBottomSheetSpringConfigs(sheetAnimationConfig);
 
     // This is weird and needs to be a ref for the onDismiss prop
     // See note above the prop
@@ -68,10 +63,10 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         ref={bottomSheetModalRef}
         index={1}
         snapPoints={SHEET_SNAP_POINTS}
-        style={styles.bottomSheet}
-        handleStyle={styles.bottomSheetHandle}
-        handleIndicatorStyle={styles.bottomSheetHandleIndicator}
-        backgroundStyle={styles.bottomSheetBackgroundStyle}
+        style={sheetStyles.bottomSheet}
+        handleStyle={sheetStyles.bottomSheetHandle}
+        handleIndicatorStyle={sheetStyles.bottomSheetHandleIndicator}
+        backgroundStyle={sheetStyles.bottomSheetBackgroundStyle}
         animationConfigs={bottomSheetAnimationConfigs}
         //
         // This is weird because the bottom sheet can be dismissed by swiping down
@@ -106,36 +101,5 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     );
   }
 );
-
-const styles = StyleSheet.create({
-  bottomSheetHandle: {
-    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  bottomSheetHandleIndicator: {
-    backgroundColor: colors.ios.light.gray["2"].toRgbString(),
-  },
-  bottomSheetBackgroundStyle: {
-    flex: 1,
-    backgroundColor: colors.ios.light.gray["6"].toRgbString(),
-  },
-  bottomSheet: {
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-
-    elevation: 5,
-  },
-  bottomSheetContent: {
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
 
 export default DestinationModal;
