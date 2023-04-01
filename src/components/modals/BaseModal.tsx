@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   BottomSheetModal,
   useBottomSheetSpringConfigs,
@@ -9,7 +10,9 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import { Button } from "react-native";
+import { Button, TouchableOpacity, View } from "react-native";
+import { TouchableHighlight } from "react-native-gesture-handler";
+import { colors } from "../../colors";
 
 import {
   sheetAnimationConfig,
@@ -77,14 +80,34 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
         }}
       >
         {props.children}
-        <Button
-          title="close"
+        <TouchableOpacity
+          hitSlop={10}
+          activeOpacity={0.5}
+          style={{
+            position: "absolute",
+            right: 16,
+            backgroundColor: colors.ios.light.gray["4"]
+              .setAlpha(0.5)
+              .toRgbString(),
+            borderRadius: 14,
+            width: 28,
+            height: 28,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
           onPress={() => {
             isOpen.current = false;
             props.onClose?.();
             modalRef.current?.dismiss();
           }}
-        />
+        >
+          <Ionicons
+            name="ios-close"
+            size={24}
+            color={colors.ios.light.gray["1"].darken().toRgbString()}
+            style={{ transform: [{ translateX: 0.5 }] }}
+          />
+        </TouchableOpacity>
       </BottomSheetModal>
     );
   }
