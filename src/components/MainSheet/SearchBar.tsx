@@ -17,7 +17,6 @@ import { match } from "ts-pattern";
 import {
   MainSheetMachineAtom,
   MainSheetMachineValueAtom,
-  SheetViewMachineStates,
 } from "./MainSheetMachine";
 import { colors } from "../../colors";
 import { AppleEasing } from "../../utils/easing";
@@ -30,7 +29,6 @@ export default function SearchBar(props: Props) {
   // #region State
   const searchInputRef = useRef<TextInput>(null);
 
-  // Very marginal? possible render optimization by using derived read-only atoms
   const sheetMachineSend = useSetAtom(MainSheetMachineAtom);
   const sheetMachineValue = useAtomValue(MainSheetMachineValueAtom);
 
@@ -68,7 +66,7 @@ export default function SearchBar(props: Props) {
       duration: 200,
     };
 
-    match(sheetMachineValue as SheetViewMachineStates)
+    match(sheetMachineValue)
       .with("home", () => {
         Animated.timing(rightIconWidthAnim, {
           toValue: 48,
@@ -97,6 +95,55 @@ export default function SearchBar(props: Props) {
     [sheetMachineValue, blurSearchInput]
   );
   // #endregion
+
+  // Icon to right of search bar switches
+  // Cancel when in search or transitioning to search
+  // Maps when in home or transitioning to home
+  const rightIcon = match(sheetMachineValue)
+    .with("search", "transitioning_to_search", () => (
+      // Cancel button
+      <TouchableOpacity
+        style={{
+          marginLeft: 16,
+          position: "relative",
+          alignItems: "center",
+        }}
+        onPress={onCancel}
+      >
+        <Text
+          style={{
+            color: colors.ios.light.blue.toRgbString(),
+            fontSize: 18,
+            width: 56,
+          }}
+        >
+          Cancel
+        </Text>
+      </TouchableOpacity>
+    ))
+    .with("home", () => (
+      // Maps button
+      <TouchableOpacity
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          // backgroundColor: colors.ios.light.gray["4"].toRgbString(),
+          borderColor: colors.ios.light.gray["1"].toString(),
+          borderWidth: 2,
+          marginLeft: 16,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Ionicons
+          name="ios-map"
+          size={22}
+          color={colors.ios.light.gray["1"].darken().toString()}
+        />
+      </TouchableOpacity>
+    ))
+    .exhaustive();
 
   return (
     <>
@@ -128,41 +175,7 @@ export default function SearchBar(props: Props) {
         <Animated.View
           style={{ alignItems: "flex-end", width: rightIconWidthAnim }}
         >
-          {match(
-            sheetMachineValue === "search" ||
-              sheetMachineValue === "transitioning_to_search"
-          )
-            .with(true, () => (
-              <TouchableOpacity
-                style={{
-                  marginLeft: 16,
-                  position: "relative",
-                  alignItems: "center",
-                }}
-                onPress={onCancel}
-              >
-                <Text
-                  style={{
-                    color: colors.ios.light.blue.toRgbString(),
-                    fontSize: 18,
-                    width: 56,
-                  }}
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            ))
-            .with(false, () => (
-              <View
-                style={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: "red",
-                  marginLeft: 16,
-                }}
-              />
-            ))
-            .exhaustive()}
+          {rightIcon}
         </Animated.View>
       </View>
     </>
