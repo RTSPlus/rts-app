@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getRoutes } from "../rts-api/rts";
+import { getRoutes } from "../rts-api/getRoutes";
 
 export function useAvailableRoutes() {
   const result = useQuery({
