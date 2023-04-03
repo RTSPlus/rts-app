@@ -6,7 +6,9 @@ import DestinationModal, {
   DestinationModalOpenPayload,
   DestinationModalRef,
 } from "./DestinationModal";
-import MapOptionsModal, { MapOptionsModalRef } from "./MapOptionsModal";
+import MapOptionsModal, {
+  MapOptionsModalRef,
+} from "./MapOptionsModal/MapOptionsModal";
 import RouteModal, { RouteModalOpenPayload, RouteModalRef } from "./RouteModal";
 
 /**
