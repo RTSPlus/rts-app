@@ -116,6 +116,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     // Remove
     paddingLeft: 18,
-    gap: 20,
   },
 });

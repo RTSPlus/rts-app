@@ -16,6 +16,10 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: "empty" | "showingDirections" | "showingRoutes";
+  matchesStates:
+    | "empty"
+    | "showingDirections"
+    | "showingRoutes"
+    | "showingSingleRoute";
   tags: never;
 }

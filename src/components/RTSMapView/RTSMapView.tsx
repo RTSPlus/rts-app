@@ -7,7 +7,7 @@ import { ViewProps } from "react-native";
 import MapView from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import { match } from "ts-pattern";
-import { createMachine } from "xstate";
+import { createMachine, assign } from "xstate";
 
 import VehicleLocationsView from "./VehicleLocationsView";
 import { readViewingRoutes } from "./mapPreferences";
@@ -31,12 +31,21 @@ const initialRegion = {
   longitudeDelta: bounds.lat_max - bounds.lat_min,
 };
 
-type Context = object;
-
-type Events = {
-  type: "SHOW_ROUTES";
-  routes: number[];
+type Context = {
+  singleRouteNum: number;
 };
+
+type Events =
+  | {
+      type: "SHOW_ROUTES";
+    }
+  | {
+      type: "SHOW_SINGLE_ROUTE";
+      routeNum: number;
+    }
+  | {
+      type: "BACK";
+    };
 
 export const RTSMapViewMachine = createMachine({
   tsTypes: {} as import("./RTSMapView.typegen").Typegen0,
@@ -46,13 +55,29 @@ export const RTSMapViewMachine = createMachine({
   },
   id: "rtsMapViewMachine",
   initial: "empty",
+  context: {
+    singleRouteNum: 0,
+  },
   states: {
     empty: {
       on: {
         SHOW_ROUTES: "showingRoutes",
       },
     },
-    showingRoutes: {},
+    showingRoutes: {
+      on: {
+        SHOW_SINGLE_ROUTE: {
+          target: "showingSingleRoute",
+          actions: [assign({ singleRouteNum: (_, event) => event.routeNum })],
+        },
+      },
+    },
+    showingSingleRoute: {
+      on: {
+        // TODO: Make this a proper history route
+        BACK: "showingRoutes",
+      },
+    },
     showingDirections: {},
   },
   predictableActionArguments: true,
@@ -82,9 +107,14 @@ export default function RTSMapView(props: ViewProps) {
     >
       {match(mapViewState.value as RTSMapViewMachineStates)
         .with("empty", () => <></>)
-        .with("showingRoutes", (state) => (
+        .with("showingRoutes", () => (
           <VehicleLocationsView
             selectedRoutes={Array.from(viewingRoutes ?? [])}
+          />
+        ))
+        .with("showingSingleRoute", () => (
+          <VehicleLocationsView
+            selectedRoutes={[mapViewState.context.singleRouteNum]}
           />
         ))
         .with("showingDirections", () => (

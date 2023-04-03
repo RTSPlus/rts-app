@@ -1,8 +1,16 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { useSetAtom } from "jotai";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Text } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
+import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";
 
 export type RouteModalOpenPayload = {
   routeNumber: number;
@@ -20,26 +28,40 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
   const baseModalRef = useRef<BaseModalRef>(null);
   const [routeNum, setRouteNum] = useState(0);
 
+  const mapViewSend = useSetAtom(RTSMapViewMachineAtom);
+
+  const open = useCallback(
+    (payload: RouteModalOpenPayload) => {
+      baseModalRef.current?.open();
+      mapViewSend({
+        type: "SHOW_SINGLE_ROUTE",
+        routeNum: payload.routeNumber,
+      });
+      setRouteNum(payload.routeNumber);
+    },
+    [mapViewSend]
+  );
+
+  const onClose = useCallback(() => {
+    mapViewSend({ type: "BACK" });
+    props.modalControllerDispatch({
+      event: "CLOSE_ROUTE",
+    });
+  }, [mapViewSend, props]);
+
   useImperativeHandle(
     ref,
     () => ({
-      open: (payload) => {
-        baseModalRef.current?.open();
-        setRouteNum(payload.routeNumber);
-      },
+      open,
     }),
-    []
+    [open]
   );
 
   return (
     <BaseModal
       titleText={`Route ${routeNum}`}
       ref={baseModalRef}
-      onClose={() =>
-        props.modalControllerDispatch({
-          event: "CLOSE_ROUTE",
-        })
-      }
+      onClose={onClose}
     >
       <Text>yuh</Text>
     </BaseModal>

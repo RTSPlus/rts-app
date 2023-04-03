@@ -3,7 +3,6 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import { useSetAtom } from "jotai";
 import { NativeBaseProvider } from "native-base";
 import React, { useEffect, PropsWithChildren } from "react";
 import { StyleSheet, View } from "react-native";
