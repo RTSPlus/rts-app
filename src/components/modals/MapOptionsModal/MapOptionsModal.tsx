@@ -1,4 +1,5 @@
-import { forwardRef, Fragment, useImperativeHandle, useRef } from "react";
+import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 
 import RouteRow from "./RouteRow";
@@ -44,19 +45,17 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
       }
     >
       <View style={styles.topDivider} />
-      <View>
-        {(availableRoutes ?? []).map((route, i) => (
-          <Fragment key={i}>
-            <RouteRow routeItem={route} />
-            <View style={styles.itemDivider} />
-          </Fragment>
-        ))}
-      </View>
+      <BottomSheetFlatList
+        contentContainerStyle={{ paddingBottom: 24 }}
+        data={availableRoutes}
+        renderItem={({ item }) => <RouteRow routeItem={item} />}
+        keyExtractor={(route) => route.num.toString()}
+        ItemSeparatorComponent={() => <View style={styles.itemDivider} />}
+      />
     </BaseModal>
   );
 });
 
-// React native styles
 const styles = StyleSheet.create({
   topDivider: {
     backgroundColor: colors.ios.light.gray["3"].toRgbString(),
