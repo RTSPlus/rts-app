@@ -11,6 +11,13 @@ import {
   useRef,
 } from "react";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import { colors } from "../../colors";
 import {
@@ -22,6 +29,7 @@ import {
 type BaseModalProps = {
   titleText?: string;
   onClose?: () => void;
+  hideBodyOnClose?: boolean;
 };
 
 export type BaseModalRef = {
@@ -37,7 +45,7 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
       useBottomSheetSpringConfigs(sheetAnimationConfig);
 
     // This is weird and needs to be a ref for the onDismiss prop
-    // See note above the prop
+    // See note above the onDismiss prop
     const isOpen = useRef(false);
 
     const open = useCallback(() => {
@@ -53,6 +61,20 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
       [open]
     );
 
+    // #region Body opacity animation
+    const animatedIndex = useSharedValue(1);
+    const bodyOpacity = useDerivedValue(
+      () =>
+        interpolate(animatedIndex.value, [0, 0.2], [0, 1], {
+          extrapolateRight: Extrapolation.CLAMP,
+        }),
+      []
+    );
+    const bodyAnimatedStyle = useAnimatedStyle(() => ({
+      opacity: bodyOpacity.value,
+    }));
+    // #endregion
+
     return (
       <BottomSheetModal
         ref={modalRef}
@@ -63,6 +85,7 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
         handleIndicatorStyle={sheetStyles.bottomSheetHandleIndicator}
         backgroundStyle={sheetStyles.bottomSheetBackgroundStyle}
         animationConfigs={bottomSheetAnimationConfigs}
+        animatedIndex={animatedIndex}
         //
         // This is weird because the bottom sheet can be dismissed by swiping down
         // and we need to dispatch the state change. But we also want to close the
@@ -82,7 +105,7 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
         <View style={styles.topRow}>
           <Text style={styles.title}>{props.titleText ?? ""}</Text>
           <TouchableOpacity
-            hitSlop={10}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             activeOpacity={0.5}
             style={styles.closeBtn}
             onPress={() => {
@@ -99,7 +122,9 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
             />
           </TouchableOpacity>
         </View>
-        {props.children}
+        <Animated.View style={[bodyAnimatedStyle, { flex: 1 }]}>
+          {props.children}
+        </Animated.View>
       </BottomSheetModal>
     );
   }

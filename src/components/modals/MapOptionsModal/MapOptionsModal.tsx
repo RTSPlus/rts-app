@@ -49,6 +49,7 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
           event: "CLOSE_ROUTE",
         })
       }
+      hideBodyOnClose
     >
       <View style={styles.topDivider} />
       <BottomSheetFlatList
