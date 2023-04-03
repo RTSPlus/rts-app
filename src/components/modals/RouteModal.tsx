@@ -10,8 +10,8 @@ import { Text } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
-import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";
 import { useRoute } from "../../api-controller/useRoutes";
+import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";
 
 export type RouteModalOpenPayload = {
   routeNumber: number;

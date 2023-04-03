@@ -10,17 +10,17 @@ import { readViewingRoutes } from "../../RTSMapView/mapPreferences";
 import BaseModal, { BaseModalRef } from "../BaseModal";
 import type { ModalControllerDispatchEvent } from "../ModalController";
 
-export type MapOptionsModalPayload = object;
+export type YourMapModalPayload = object;
 
-export type MapOptionsModalRef = {
-  open: (payload: MapOptionsModalPayload) => void;
+export type YourMapModalRef = {
+  open: (payload: YourMapModalPayload) => void;
 };
 
 type Props = {
   modalControllerDispatch: (event: ModalControllerDispatchEvent) => void;
 };
 
-const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
+const YourMapModal = forwardRef<YourMapModalRef, Props>((props, ref) => {
   // #region Ref handling
   const baseModalRef = useRef<BaseModalRef>(null);
   useImperativeHandle(
@@ -82,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapOptionsModal;
+export default YourMapModal;

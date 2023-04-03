@@ -6,10 +6,8 @@ import DestinationModal, {
   DestinationModalOpenPayload,
   DestinationModalRef,
 } from "./DestinationModal";
-import MapOptionsModal, {
-  MapOptionsModalRef,
-} from "./MapOptionsModal/MapOptionsModal";
 import RouteModal, { RouteModalOpenPayload, RouteModalRef } from "./RouteModal";
+import YourMapModal, { YourMapModalRef } from "./YourMapModal/YourMapModal";
 
 /**
  * BIG WARNING TODO:
@@ -58,7 +56,7 @@ export const ModalCounterAtom = atom(0);
 export default function ModalController() {
   const destinationModalRef = useRef<DestinationModalRef>(null);
   const routeModalRef = useRef<RouteModalRef>(null);
-  const mapOptionsModalRef = useRef<MapOptionsModalRef>(null);
+  const yourMapModalRef = useRef<YourMapModalRef>(null);
 
   const setModalCounter = useSetAtom(ModalCounterAtom);
 
@@ -74,7 +72,7 @@ export default function ModalController() {
           setModalCounter((prev) => prev + 1);
         })
         .with({ event: "OPEN_MAP_OPTIONS" }, () => {
-          mapOptionsModalRef.current?.open({});
+          yourMapModalRef.current?.open({});
           setModalCounter((prev) => prev + 1);
         })
         .with(
@@ -100,10 +98,7 @@ export default function ModalController() {
         modalControllerDispatch={dispatch}
       />
       <RouteModal ref={routeModalRef} modalControllerDispatch={dispatch} />
-      <MapOptionsModal
-        ref={mapOptionsModalRef}
-        modalControllerDispatch={dispatch}
-      />
+      <YourMapModal ref={yourMapModalRef} modalControllerDispatch={dispatch} />
     </>
   );
 }
