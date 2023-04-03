@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
 import React, { useEffect, PropsWithChildren } from "react";
-import { StyleSheet, View } from "react-native";
+import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
@@ -16,6 +16,10 @@ import { colors } from "./colors";
 import MainSheet from "./components/MainSheet/MainSheet";
 import RTSMapView from "./components/RTSMapView/RTSMapView";
 import ModalController from "./components/modals/ModalController";
+
+LogBox.ignoreLogs([
+  "setNativeProps is deprecated and will be removed in next major release",
+]);
 
 const Providers = (props: PropsWithChildren) => {
   return (
