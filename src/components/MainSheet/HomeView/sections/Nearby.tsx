@@ -5,47 +5,45 @@ import { dispatch } from "../../../modals/ModalController";
 
 function RouteCircleItem() {
   return (
-    <>
-      <TouchableOpacity
+    <TouchableOpacity
+      style={{
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+      onPress={() => {
+        dispatch({ event: "OPEN_ROUTE", payload: { routeNumber: 21 } });
+      }}
+    >
+      <View
         style={{
-          flexDirection: "column",
+          width: 56,
+          height: 56,
+          backgroundColor: colors.ios.light.red.toRgbString(),
+          borderRadius: 28,
           alignItems: "center",
-        }}
-        onPress={() => {
-          dispatch({ event: "OPEN_ROUTE", payload: { routeNumber: 21 } });
+          justifyContent: "center",
         }}
       >
-        <View
-          style={{
-            width: 56,
-            height: 56,
-            backgroundColor: colors.ios.light.red.toRgbString(),
-            borderRadius: 28,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 24,
-              fontWeight: "700",
-            }}
-          >
-            21
-          </Text>
-        </View>
-        <Text style={{ marginTop: 6, fontSize: 15 }}>Route 21</Text>
         <Text
           style={{
-            fontSize: 13,
-            color: colors.ios.light.gray["2"].toRgbString(),
+            color: "white",
+            fontSize: 24,
+            fontWeight: "700",
           }}
         >
-          5 mins
+          21
         </Text>
-      </TouchableOpacity>
-    </>
+      </View>
+      <Text style={{ marginTop: 6, fontSize: 15 }}>Route 21</Text>
+      <Text
+        style={{
+          fontSize: 13,
+          color: colors.ios.light.gray["2"].toRgbString(),
+        }}
+      >
+        5 mins
+      </Text>
+    </TouchableOpacity>
   );
 }
 

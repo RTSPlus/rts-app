@@ -11,6 +11,7 @@ import { Text } from "react-native";
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
 import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";
+import { useRoute } from "../../api-controller/useRoutes";
 
 export type RouteModalOpenPayload = {
   routeNumber: number;
@@ -26,7 +27,9 @@ type Props = {
 
 const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
   const baseModalRef = useRef<BaseModalRef>(null);
+
   const [routeNum, setRouteNum] = useState(0);
+  const route = useRoute(routeNum);
 
   const mapViewSend = useSetAtom(RTSMapViewMachineAtom);
 
@@ -60,10 +63,11 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
   return (
     <BaseModal
       titleText={`Route ${routeNum}`}
+      subtitleText={route?.name}
       ref={baseModalRef}
       onClose={onClose}
     >
-      <Text>yuh</Text>
+      {/* <Text>yuh</Text> */}
     </BaseModal>
   );
 });

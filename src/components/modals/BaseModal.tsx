@@ -28,6 +28,7 @@ import {
 
 type BaseModalProps = {
   titleText?: string;
+  subtitleText?: string;
   onClose?: () => void;
   hideBodyOnClose?: boolean;
 };
@@ -103,7 +104,14 @@ const BaseModal = forwardRef<BaseModalRef, PropsWithChildren<BaseModalProps>>(
         }}
       >
         <View style={styles.topRow}>
-          <Text style={styles.title}>{props.titleText ?? ""}</Text>
+          <View>
+            {props.titleText && (
+              <Text style={styles.title}>{props.titleText}</Text>
+            )}
+            {props.subtitleText && (
+              <Text style={styles.subtitle}>{props.subtitleText}</Text>
+            )}
+          </View>
           <TouchableOpacity
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             activeOpacity={0.5}
@@ -141,6 +149,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginTop: 0,
+  },
+  subtitle: {
+    fontSize: 20,
+    color: colors.ios.light.gray["1"].darken().toRgbString(),
   },
   closeBtn: {
     backgroundColor: colors.ios.light.gray["4"].setAlpha(0.5).toRgbString(),

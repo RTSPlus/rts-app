@@ -1,7 +1,9 @@
-import { atom, useAtomValue } from "jotai";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAtomValue } from "jotai";
+import { atomWithStorage, createJSONStorage } from "jotai/utils";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
-import { colors } from "../../../../colors";
+import { routesShortName } from "../../../../rts-api/routesMeta";
 import { dispatch } from "../../../modals/ModalController";
 
 type FavoritesItemsType = {
@@ -10,7 +12,13 @@ type FavoritesItemsType = {
   routeName: string;
   routeColor: string;
 };
-export const favoritesItemsAtom = atom<FavoritesItemsType[]>([]);
+
+const storage = createJSONStorage(() => AsyncStorage);
+export const favoritesItemsAtom = atomWithStorage<FavoritesItemsType[]>(
+  "favorites-items",
+  [],
+  storage
+);
 
 function RouteCircleItem(props: {
   routeNumber: number;
@@ -23,6 +31,7 @@ function RouteCircleItem(props: {
         flexDirection: "column",
         alignItems: "center",
         marginRight: 16,
+        width: 80,
       }}
       onPress={() => {
         dispatch({
@@ -51,14 +60,13 @@ function RouteCircleItem(props: {
           {props.routeNumber}
         </Text>
       </View>
-      <Text style={{ marginTop: 6, fontSize: 15 }}>{props.routeName}</Text>
       <Text
-        style={{
-          fontSize: 13,
-          color: colors.ios.light.gray["2"].toRgbString(),
-        }}
+        style={{ marginTop: 6, fontSize: 15, textAlign: "center" }}
+        numberOfLines={2}
       >
-        5 mins
+        {routesShortName.has(props.routeNumber)
+          ? routesShortName.get(props.routeNumber)
+          : props.routeName}
       </Text>
     </TouchableOpacity>
   );
@@ -107,6 +115,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
 
-    paddingLeft: 16,
+    paddingLeft: 12,
   },
 });
