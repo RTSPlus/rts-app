@@ -10,6 +10,7 @@ import Animated, {
   useDerivedValue,
 } from "react-native-reanimated";
 
+import Favorites from "./sections/Favorites";
 import Nearby from "./sections/Nearby";
 
 export default function HomeViewBody() {
@@ -31,6 +32,8 @@ export default function HomeViewBody() {
     <BottomSheetScrollView>
       <Animated.View style={bodyAnimatedStyle}>
         {/* Spacer */}
+        <View style={{ flex: 1, height: 24 }} />
+        <Favorites />
         <View style={{ flex: 1, height: 24 }} />
         <Nearby />
       </Animated.View>
