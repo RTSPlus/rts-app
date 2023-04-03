@@ -8,7 +8,8 @@
     "dev-clear-cache": "expo start --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "watchman-clear": "watchman watch-del './'; watchman watch-project './'"
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
