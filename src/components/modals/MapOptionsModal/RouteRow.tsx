@@ -22,7 +22,7 @@ import {
   addViewingRoute,
   deleteViewingRoute,
 } from "../../RTSMapView/mapPreferences";
-import { dispatch } from "../ModalController";
+import type { ModalControllerDispatchEvent } from "../ModalController";
 
 type HapticFeedbackMachineEvent =
   | { type: "PASS_ACTIVE_THRESHOLD" }
@@ -99,6 +99,7 @@ const ACTIVE_THRESHOLD = 150;
 export default function RouteRow(props: {
   routeItem: RouteData;
   isInViewingRoutes: boolean;
+  modalControllerDispatch: (event: ModalControllerDispatchEvent) => void;
 }) {
   const swipeableRowRef = useRef<Swipeable>(null);
 
@@ -246,7 +247,7 @@ export default function RouteRow(props: {
       <TouchableWithoutFeedback
         style={rowStyles.row}
         onPress={() =>
-          dispatch({
+          props.modalControllerDispatch({
             event: "OPEN_ROUTE",
             payload: { routeNumber: props.routeItem.num },
           })

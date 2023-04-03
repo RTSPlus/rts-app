@@ -59,6 +59,7 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
           <RouteRow
             routeItem={item}
             isInViewingRoutes={viewingRoutes?.has(item.num) ?? false}
+            modalControllerDispatch={props.modalControllerDispatch}
           />
         )}
         keyExtractor={(route) => route.num.toString()}
