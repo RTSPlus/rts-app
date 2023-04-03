@@ -74,9 +74,7 @@ const hapticFeedbackMachine = createMachine({
             },
           ],
         },
-        CLOSE: {
-          target: "closed",
-        },
+        CLOSE: "closed",
       },
     },
     closed: {

@@ -39,9 +39,7 @@ export const MainSheetMachine = createMachine({
     },
     transitioning_to_search: {
       on: {
-        FINISHED_TRANSITION: {
-          target: "search",
-        },
+        FINISHED_TRANSITION: "search",
       },
     },
     search: {
