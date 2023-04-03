@@ -3,11 +3,11 @@ import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
+import { match } from "ts-pattern";
 import { createMachine } from "xstate";
 
 import { colors } from "../../../colors";
 import { RouteData } from "../../../rts-api/getRoutes";
-import { match } from "ts-pattern";
 
 type HapticFeedbackMachineEvent =
   | { type: "PASS_ACTIVE_THRESHOLD" }
@@ -63,6 +63,7 @@ const hapticFeedbackMachine = createMachine({
   predictableActionArguments: true,
 });
 
+const ACTIVE_THRESHOLD = 150;
 export default function RouteRow(props: { routeItem: RouteData }) {
   const swipeableRowRef = useRef<Swipeable>(null);
 
@@ -76,11 +77,11 @@ export default function RouteRow(props: { routeItem: RouteData }) {
   const renderLeftActions = (_progress: number, dragX: Animated.Value) => {
     dragX.addListener(({ value }) => {
       if (hapticFeedbackLeftState.matches("idle")) {
-        if (value >= 150) {
+        if (value >= ACTIVE_THRESHOLD) {
           hapticFeedbackLeftSend("PASS_ACTIVE_THRESHOLD");
         }
       } else if (hapticFeedbackLeftState.matches("active")) {
-        if (value < 150) {
+        if (value < ACTIVE_THRESHOLD) {
           hapticFeedbackLeftSend("BACK_TO_INACTIVE_THRESHOLD");
         }
       }
@@ -117,11 +118,11 @@ export default function RouteRow(props: { routeItem: RouteData }) {
   ) => {
     dragX.addListener(({ value }) => {
       if (hapticFeedbackRightState.matches("idle")) {
-        if (value <= -150) {
+        if (value <= -ACTIVE_THRESHOLD) {
           hapticFeedbackRightSend("PASS_ACTIVE_THRESHOLD");
         }
       } else if (hapticFeedbackRightState.matches("active")) {
-        if (value > -150) {
+        if (value > -ACTIVE_THRESHOLD) {
           hapticFeedbackRightSend("BACK_TO_INACTIVE_THRESHOLD");
         }
       }
