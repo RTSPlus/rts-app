@@ -66,7 +66,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
         }
       });
     });
-  }, [routePatternQueries]);
+  }, [pidToPatternsMap, routePatternQueries, routes]);
 
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
   const usedPathIDs = new Set(
@@ -120,7 +120,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
         });
       }
     });
-  }, [vehicleLocations]);
+  }, [pidToPatternsMap, vehicleLocations]);
 
   return (
     <>
