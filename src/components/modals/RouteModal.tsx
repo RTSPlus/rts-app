@@ -16,7 +16,7 @@ type Props = {
   modalControllerDispatch: (event: ModalControllerDispatchEvent) => void;
 };
 
-const DestinationModal = forwardRef<RouteModalRef, Props>((props, ref) => {
+const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
   const baseModalRef = useRef<BaseModalRef>(null);
   const [routeNum, setRouteNum] = useState(0);
 
@@ -33,6 +33,7 @@ const DestinationModal = forwardRef<RouteModalRef, Props>((props, ref) => {
 
   return (
     <BaseModal
+      titleText={`Route ${routeNum}`}
       ref={baseModalRef}
       onClose={() =>
         props.modalControllerDispatch({
@@ -40,9 +41,9 @@ const DestinationModal = forwardRef<RouteModalRef, Props>((props, ref) => {
         })
       }
     >
-      <Text>{routeNum}</Text>
+      <Text>yuh</Text>
     </BaseModal>
   );
 });
 
-export default DestinationModal;
+export default RouteModal;
