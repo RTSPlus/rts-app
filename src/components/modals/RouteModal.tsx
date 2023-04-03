@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Text } from "react-native";
+import { Text, StyleSheet, View } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
@@ -67,9 +67,20 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
       ref={baseModalRef}
       onClose={onClose}
     >
-      {/* <Text>yuh</Text> */}
+      <View style={styles.container}>
+        <Text style={{ fontSize: 20 }}>Inbound</Text>
+        <Text style={{ fontSize: 20 }}>Outbound</Text>
+        <Text>Stops:</Text>
+      </View>
     </BaseModal>
   );
+});
+
+const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: 16,
+    marginTop: 16,
+  },
 });
 
 export default RouteModal;
