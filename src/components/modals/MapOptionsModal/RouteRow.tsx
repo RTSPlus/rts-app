@@ -2,7 +2,11 @@ import { useMachine } from "@xstate/react";
 import * as Haptics from "expo-haptics";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
-import { RectButton, Swipeable } from "react-native-gesture-handler";
+import {
+  RectButton,
+  Swipeable,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
 import {
   useAnimatedStyle,
   useSharedValue,
@@ -18,6 +22,7 @@ import {
   addViewingRoute,
   deleteViewingRoute,
 } from "../../RTSMapView/mapPreferences";
+import { dispatch } from "../ModalController";
 
 type HapticFeedbackMachineEvent =
   | { type: "PASS_ACTIVE_THRESHOLD" }
@@ -114,7 +119,7 @@ export default function RouteRow(props: {
   // sync props to shared value
   useEffect(() => {
     isInViewingRoutesShared.value = withTiming(isInViewingRoutes ? 1 : 0.3, {
-      duration: 150,
+      duration: 300,
     });
   }, [isInViewingRoutesShared, isInViewingRoutes]);
   const isViewingOpacityStyles = useAnimatedStyle(() => ({
@@ -238,7 +243,15 @@ export default function RouteRow(props: {
         hapticFeedbackRightSend("CLOSE");
       }}
     >
-      <View style={rowStyles.row}>
+      <TouchableWithoutFeedback
+        style={rowStyles.row}
+        onPress={() =>
+          dispatch({
+            event: "OPEN_ROUTE",
+            payload: { routeNumber: props.routeItem.num },
+          })
+        }
+      >
         <Reanimated.View
           style={[
             rowStyles.routeIndicator,
@@ -259,7 +272,7 @@ export default function RouteRow(props: {
             {props.routeItem.name}
           </Reanimated.Text>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Swipeable>
   );
 }
