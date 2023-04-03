@@ -1,13 +1,21 @@
 import { useMachine } from "@xstate/react";
 import * as Haptics from "expo-haptics";
-import { useRef } from "react";
+import { useSetAtom } from "jotai";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
+import {
+  useAnimatedStyle,
+  useSharedValue,
+  default as Reanimated,
+  withTiming,
+} from "react-native-reanimated";
 import { match } from "ts-pattern";
-import { createMachine } from "xstate";
+import { assign, createMachine } from "xstate";
 
 import { colors } from "../../../colors";
 import { RouteData } from "../../../rts-api/getRoutes";
+import { viewingRoutesAtom } from "../../RTSMapView/mapPreferences";
 
 type HapticFeedbackMachineEvent =
   | { type: "PASS_ACTIVE_THRESHOLD" }
@@ -15,20 +23,30 @@ type HapticFeedbackMachineEvent =
   | { type: "CLOSE" }
   | { type: "RESET" };
 
+type HapticFeedbackMachineContext = {
+  triggerThresholdByClose: boolean;
+};
+
 const hapticFeedbackMachine = createMachine({
   tsTypes: {} as import("./RouteRow.typegen").Typegen0,
   schema: {
+    context: {} as HapticFeedbackMachineContext,
     events: {} as HapticFeedbackMachineEvent,
   },
   id: `hapticFeedbackMachine`,
   initial: "idle",
+  context: {
+    triggerThresholdByClose: false,
+  },
   states: {
     idle: {
       on: {
         PASS_ACTIVE_THRESHOLD: {
           target: "active",
           actions: [
-            () => console.log("pass active threshold"),
+            assign({
+              triggerThresholdByClose: true,
+            }),
             () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             },
@@ -41,7 +59,9 @@ const hapticFeedbackMachine = createMachine({
         BACK_TO_INACTIVE_THRESHOLD: {
           target: "idle",
           actions: [
-            () => console.log("pass inactive threshold"),
+            assign({
+              triggerThresholdByClose: false,
+            }),
             () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             },
@@ -56,6 +76,11 @@ const hapticFeedbackMachine = createMachine({
       on: {
         RESET: {
           target: "idle",
+          actions: [
+            assign({
+              triggerThresholdByClose: false,
+            }),
+          ],
         },
       },
     },
@@ -64,7 +89,10 @@ const hapticFeedbackMachine = createMachine({
 });
 
 const ACTIVE_THRESHOLD = 150;
-export default function RouteRow(props: { routeItem: RouteData }) {
+export default function RouteRow(props: {
+  routeItem: RouteData;
+  isInViewingRoutes: boolean;
+}) {
   const swipeableRowRef = useRef<Swipeable>(null);
 
   const [hapticFeedbackLeftState, hapticFeedbackLeftSend] = useMachine(
@@ -74,6 +102,24 @@ export default function RouteRow(props: { routeItem: RouteData }) {
     () => hapticFeedbackMachine
   );
 
+  const [isInViewingRoutes, setIsInViewingRoutes] = useState(
+    props.isInViewingRoutes
+  );
+  const setViewingRoutesStorage = useSetAtom(viewingRoutesAtom);
+
+  const isInViewingRoutesShared = useSharedValue(isInViewingRoutes ? 1 : 0.5);
+  // sync props to shared value
+  useEffect(() => {
+    isInViewingRoutesShared.value = withTiming(isInViewingRoutes ? 1 : 0.5, {
+      duration: 150,
+    });
+  }, [isInViewingRoutesShared, isInViewingRoutes]);
+
+  const isViewingOpacityStyles = useAnimatedStyle(() => ({
+    opacity: isInViewingRoutesShared.value,
+  }));
+
+  // #region Left and Right actions
   const renderLeftActions = (_progress: number, dragX: Animated.Value) => {
     dragX.addListener(({ value }) => {
       if (hapticFeedbackLeftState.matches("idle")) {
@@ -142,11 +188,12 @@ export default function RouteRow(props: { routeItem: RouteData }) {
         <Animated.Text
           style={[rowStyles.actionText, { transform: [{ translateX: trans }] }]}
         >
-          Hide
+          {isInViewingRoutes ? "Hide" : "Show"}
         </Animated.Text>
       </RectButton>
     );
   };
+  // #endregion
 
   return (
     <Swipeable
@@ -155,8 +202,25 @@ export default function RouteRow(props: { routeItem: RouteData }) {
       renderRightActions={renderRightActions}
       onSwipeableWillClose={(direction) => {
         match(direction)
-          .with("left", () => hapticFeedbackLeftSend("CLOSE"))
-          .with("right", () => hapticFeedbackRightSend("CLOSE"))
+          .with("left", () => {})
+          .with("right", () => {
+            if (hapticFeedbackRightState.context.triggerThresholdByClose) {
+              if (isInViewingRoutes) {
+                // remove this route from the viewing routes
+                setIsInViewingRoutes(false);
+                setViewingRoutesStorage((prev) =>
+                  prev.filter((route) => route !== props.routeItem.num)
+                );
+              } else {
+                // add this route to the viewing routes
+                setIsInViewingRoutes(true);
+                setViewingRoutesStorage((prev) => [
+                  ...prev,
+                  props.routeItem.num,
+                ]);
+              }
+            }
+          })
           .exhaustive();
       }}
       onSwipeableClose={(direction) => {
@@ -177,9 +241,10 @@ export default function RouteRow(props: { routeItem: RouteData }) {
       }}
     >
       <View style={rowStyles.row}>
-        <View
+        <Reanimated.View
           style={[
             rowStyles.routeIndicator,
+            isViewingOpacityStyles,
             {
               backgroundColor: props.routeItem.color,
             },
@@ -188,9 +253,13 @@ export default function RouteRow(props: { routeItem: RouteData }) {
           <Text style={rowStyles.routeIndicatorText}>
             {props.routeItem.num}
           </Text>
-        </View>
+        </Reanimated.View>
         <View style={{ flex: 1 }}>
-          <Text style={rowStyles.routeName}>{props.routeItem.name}</Text>
+          <Reanimated.Text
+            style={[rowStyles.routeName, isViewingOpacityStyles]}
+          >
+            {props.routeItem.name}
+          </Reanimated.Text>
         </View>
       </View>
     </Swipeable>

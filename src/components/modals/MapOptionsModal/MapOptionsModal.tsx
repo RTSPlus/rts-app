@@ -1,10 +1,12 @@
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { useAtomValue } from "jotai";
+import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 
 import RouteRow from "./RouteRow";
 import { useAvailableRoutes } from "../../../api-controller/useAvailableRoutes";
 import { colors } from "../../../colors";
+import { viewingRoutesAtom } from "../../RTSMapView/mapPreferences";
 import BaseModal, { BaseModalRef } from "../BaseModal";
 import type { ModalControllerDispatchEvent } from "../ModalController";
 
@@ -34,6 +36,12 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
 
   const { data: availableRoutes } = useAvailableRoutes();
 
+  const viewingRoutes = useAtomValue(viewingRoutesAtom);
+  const viewingRoutesSet = useMemo(
+    () => new Set(viewingRoutes),
+    [viewingRoutes]
+  );
+
   return (
     <BaseModal
       titleText="Your Map"
@@ -48,7 +56,12 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
       <BottomSheetFlatList
         contentContainerStyle={{ paddingBottom: 24 }}
         data={availableRoutes}
-        renderItem={({ item }) => <RouteRow routeItem={item} />}
+        renderItem={({ item }) => (
+          <RouteRow
+            routeItem={item}
+            isInViewingRoutes={viewingRoutesSet.has(item.num)}
+          />
+        )}
         keyExtractor={(route) => route.num.toString()}
         ItemSeparatorComponent={() => <View style={styles.itemDivider} />}
       />
