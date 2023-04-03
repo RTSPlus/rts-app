@@ -1,65 +1,89 @@
+import { atom, useAtomValue } from "jotai";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 import { colors } from "../../../../colors";
 import { dispatch } from "../../../modals/ModalController";
 
-function RouteCircleItem() {
+type FavoritesItemsType = {
+  type: "ROUTE";
+  routeNumber: number;
+  routeName: string;
+  routeColor: string;
+};
+export const favoritesItemsAtom = atom<FavoritesItemsType[]>([]);
+
+function RouteCircleItem(props: {
+  routeNumber: number;
+  routeName: string;
+  routeColor: string;
+}) {
   return (
-    <>
-      <TouchableOpacity
+    <TouchableOpacity
+      style={{
+        flexDirection: "column",
+        alignItems: "center",
+        marginRight: 16,
+      }}
+      onPress={() => {
+        dispatch({
+          event: "OPEN_ROUTE",
+          payload: { routeNumber: props.routeNumber },
+        });
+      }}
+    >
+      <View
         style={{
-          flexDirection: "column",
+          width: 56,
+          height: 56,
+          backgroundColor: props.routeColor,
+          borderRadius: 28,
           alignItems: "center",
-        }}
-        onPress={() => {
-          dispatch({ event: "OPEN_ROUTE", payload: { routeNumber: 21 } });
+          justifyContent: "center",
         }}
       >
-        <View
-          style={{
-            width: 56,
-            height: 56,
-            backgroundColor: colors.ios.light.red.toRgbString(),
-            borderRadius: 28,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 24,
-              fontWeight: "700",
-            }}
-          >
-            21
-          </Text>
-        </View>
-        <Text style={{ marginTop: 6, fontSize: 15 }}>Route 21</Text>
         <Text
           style={{
-            fontSize: 13,
-            color: colors.ios.light.gray["2"].toRgbString(),
+            color: "white",
+            fontSize: 24,
+            fontWeight: "700",
           }}
         >
-          5 mins
+          {props.routeNumber}
         </Text>
-      </TouchableOpacity>
-    </>
+      </View>
+      <Text style={{ marginTop: 6, fontSize: 15 }}>{props.routeName}</Text>
+      <Text
+        style={{
+          fontSize: 13,
+          color: colors.ios.light.gray["2"].toRgbString(),
+        }}
+      >
+        5 mins
+      </Text>
+    </TouchableOpacity>
   );
 }
 
 export default function Favorites() {
+  const favoritesItem = useAtomValue(favoritesItemsAtom);
+
+  const favoritesComponents = favoritesItem.map((item) => {
+    if (item.type === "ROUTE") {
+      return (
+        <RouteCircleItem
+          key={`route-${item.routeNumber}`}
+          routeName={item.routeName}
+          routeColor={item.routeColor}
+          routeNumber={item.routeNumber}
+        />
+      );
+    }
+  });
+
   return (
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionTitle}>Favorites</Text>
-      <View style={styles.sectionBody}>
-        <RouteCircleItem />
-        <View style={{ width: 30 }} />
-        <RouteCircleItem />
-        <View style={{ width: 20 }} />
-        <RouteCircleItem />
-      </View>
+      <View style={styles.sectionBody}>{favoritesComponents}</View>
     </View>
   );
 }
@@ -82,7 +106,7 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
     flexDirection: "row",
-    // Remove
-    paddingLeft: 18,
+
+    paddingLeft: 16,
   },
 });

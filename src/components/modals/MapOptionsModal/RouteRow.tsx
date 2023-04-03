@@ -1,6 +1,8 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useMachine } from "@xstate/react";
 import * as Haptics from "expo-haptics";
-import { useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import {
   RectButton,
@@ -18,6 +20,7 @@ import { assign, createMachine } from "xstate";
 
 import { colors } from "../../../colors";
 import { RouteData } from "../../../rts-api/getRoutes";
+import { favoritesItemsAtom } from "../../MainSheet/HomeView/sections/Favorites";
 import {
   addViewingRoute,
   deleteViewingRoute,
@@ -101,6 +104,16 @@ export default function RouteRow(props: {
 }) {
   const swipeableRowRef = useRef<Swipeable>(null);
 
+  // #region Favorites
+  const [favorites, setFavorites] = useAtom(favoritesItemsAtom);
+  const isInFavorites = useMemo(() => {
+    return favorites.some(
+      (item) =>
+        item.type === "ROUTE" && item.routeNumber === props.routeItem.num
+    );
+  }, [favorites, props.routeItem.num]);
+  // #endregion
+
   // #region Haptic Feedback
   const [hapticFeedbackLeftState, hapticFeedbackLeftSend] = useMachine(
     () => hapticFeedbackMachine
@@ -150,16 +163,16 @@ export default function RouteRow(props: {
     };
 
     return (
-      <RectButton style={rowStyles.leftAction} onPress={closeSwipeableRow}>
+      <RectButton style={styles.leftAction} onPress={closeSwipeableRow}>
         <Animated.Text
           style={[
-            rowStyles.actionText,
+            styles.actionText,
             {
               transform: [{ translateX: trans }],
             },
           ]}
         >
-          Favorite
+          {isInFavorites ? "Unfavorite" : "Favorite"}
         </Animated.Text>
       </RectButton>
     );
@@ -191,9 +204,9 @@ export default function RouteRow(props: {
     };
 
     return (
-      <RectButton style={rowStyles.rightAction} onPress={closeSwipeableRow}>
+      <RectButton style={styles.rightAction} onPress={closeSwipeableRow}>
         <Animated.Text
-          style={[rowStyles.actionText, { transform: [{ translateX: trans }] }]}
+          style={[styles.actionText, { transform: [{ translateX: trans }] }]}
         >
           {isInViewingRoutes ? "Hide" : "Show"}
         </Animated.Text>
@@ -208,22 +221,46 @@ export default function RouteRow(props: {
       renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
       onSwipeableWillClose={(direction) => {
-        match(direction)
-          .with("left", () => {})
-          .with("right", () => {
-            if (hapticFeedbackRightState.context.triggerThresholdByClose) {
-              if (isInViewingRoutes) {
-                // remove this route from the viewing routes
-                setIsInViewingRoutes(false);
-                deleteViewingRoute(props.routeItem.num);
-              } else {
-                // add this route to the viewing routes
-                setIsInViewingRoutes(true);
-                addViewingRoute(props.routeItem.num);
-              }
-            }
-          })
-          .exhaustive();
+        if (direction === "left") {
+          // Return if we haven't fully triggered or cancelled the swipe
+          if (!hapticFeedbackLeftState.context.triggerThresholdByClose) return;
+
+          if (isInFavorites) {
+            // remove this route from the favorites
+            setFavorites(
+              favorites.filter((item) => {
+                return !(
+                  item.type === "ROUTE" &&
+                  item.routeNumber === props.routeItem.num
+                );
+              })
+            );
+          } else {
+            // add this route to the favorites
+            setFavorites([
+              ...favorites,
+              {
+                type: "ROUTE",
+                routeNumber: props.routeItem.num,
+                routeName: props.routeItem.name,
+                routeColor: props.routeItem.color,
+              },
+            ]);
+          }
+        } else if (direction === "right") {
+          // Return if we haven't fully triggered or cancelled the swipe
+          if (!hapticFeedbackRightState.context.triggerThresholdByClose) return;
+
+          if (isInViewingRoutes) {
+            // remove this route from the viewing routes
+            setIsInViewingRoutes(false);
+            deleteViewingRoute(props.routeItem.num);
+          } else {
+            // add this route to the viewing routes
+            setIsInViewingRoutes(true);
+            addViewingRoute(props.routeItem.num);
+          }
+        }
       }}
       onSwipeableClose={(direction) => {
         match(direction)
@@ -243,7 +280,7 @@ export default function RouteRow(props: {
       }}
     >
       <TouchableWithoutFeedback
-        style={rowStyles.row}
+        style={styles.row}
         onPress={() =>
           props.modalControllerDispatch({
             event: "OPEN_ROUTE",
@@ -251,23 +288,33 @@ export default function RouteRow(props: {
           })
         }
       >
-        <Reanimated.View
-          style={[
-            rowStyles.routeIndicator,
-            isViewingOpacityStyles,
-            {
-              backgroundColor: props.routeItem.color,
-            },
-          ]}
-        >
-          <Text style={rowStyles.routeIndicatorText}>
-            {props.routeItem.num}
-          </Text>
-        </Reanimated.View>
-        <View style={{ flex: 1 }}>
-          <Reanimated.Text
-            style={[rowStyles.routeName, isViewingOpacityStyles]}
+        <View>
+          <Reanimated.View
+            style={[
+              styles.routeIndicator,
+              isViewingOpacityStyles,
+              {
+                backgroundColor: props.routeItem.color,
+              },
+            ]}
           >
+            <Text style={styles.routeIndicatorText}>{props.routeItem.num}</Text>
+          </Reanimated.View>
+          {isInFavorites && (
+            <View style={styles.favoritesStar}>
+              <Ionicons
+                name="ios-star"
+                color="white"
+                size={14}
+                style={{
+                  transform: [{ translateX: 0.5 }],
+                }}
+              />
+            </View>
+          )}
+        </View>
+        <View style={{ flex: 1 }}>
+          <Reanimated.Text style={[styles.routeName, isViewingOpacityStyles]}>
             {props.routeItem.name}
           </Reanimated.Text>
         </View>
@@ -276,7 +323,7 @@ export default function RouteRow(props: {
   );
 }
 
-const rowStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -323,5 +370,17 @@ const rowStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-end",
     flex: 1,
+  },
+
+  favoritesStar: {
+    backgroundColor: colors.ios.light.yellow.toRgbString(),
+    position: "absolute",
+    right: 7,
+    top: -7,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
