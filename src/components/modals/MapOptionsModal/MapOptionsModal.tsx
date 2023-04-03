@@ -1,12 +1,12 @@
 import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useAtomValue } from "jotai";
-import { forwardRef, useImperativeHandle, useMemo, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import { View, StyleSheet } from "react-native";
 
 import RouteRow from "./RouteRow";
 import { useAvailableRoutes } from "../../../api-controller/useAvailableRoutes";
 import { colors } from "../../../colors";
-import { viewingRoutesAtom } from "../../RTSMapView/mapPreferences";
+import { readViewingRoutes } from "../../RTSMapView/mapPreferences";
 import BaseModal, { BaseModalRef } from "../BaseModal";
 import type { ModalControllerDispatchEvent } from "../ModalController";
 
@@ -35,12 +35,10 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
   // #endregion
 
   const { data: availableRoutes } = useAvailableRoutes();
-
-  const viewingRoutes = useAtomValue(viewingRoutesAtom);
-  const viewingRoutesSet = useMemo(
-    () => new Set(viewingRoutes),
-    [viewingRoutes]
-  );
+  const { data: viewingRoutes } = useQuery({
+    queryKey: ["viewingRoutes"],
+    queryFn: readViewingRoutes,
+  });
 
   return (
     <BaseModal
@@ -59,7 +57,7 @@ const MapOptionsModal = forwardRef<MapOptionsModalRef, Props>((props, ref) => {
         renderItem={({ item }) => (
           <RouteRow
             routeItem={item}
-            isInViewingRoutes={viewingRoutesSet.has(item.num)}
+            isInViewingRoutes={viewingRoutes?.has(item.num) ?? false}
           />
         )}
         keyExtractor={(route) => route.num.toString()}

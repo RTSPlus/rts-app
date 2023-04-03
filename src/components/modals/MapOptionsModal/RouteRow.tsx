@@ -1,6 +1,5 @@
 import { useMachine } from "@xstate/react";
 import * as Haptics from "expo-haptics";
-import { useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { RectButton, Swipeable } from "react-native-gesture-handler";
@@ -15,7 +14,10 @@ import { assign, createMachine } from "xstate";
 
 import { colors } from "../../../colors";
 import { RouteData } from "../../../rts-api/getRoutes";
-import { viewingRoutesAtom } from "../../RTSMapView/mapPreferences";
+import {
+  addViewingRoute,
+  deleteViewingRoute,
+} from "../../RTSMapView/mapPreferences";
 
 type HapticFeedbackMachineEvent =
   | { type: "PASS_ACTIVE_THRESHOLD" }
@@ -95,29 +97,30 @@ export default function RouteRow(props: {
 }) {
   const swipeableRowRef = useRef<Swipeable>(null);
 
+  // #region Haptic Feedback
   const [hapticFeedbackLeftState, hapticFeedbackLeftSend] = useMachine(
     () => hapticFeedbackMachine
   );
   const [hapticFeedbackRightState, hapticFeedbackRightSend] = useMachine(
     () => hapticFeedbackMachine
   );
+  // #endregion
 
+  // #region isViewingRoutes opacity effect/animation
   const [isInViewingRoutes, setIsInViewingRoutes] = useState(
     props.isInViewingRoutes
   );
-  const setViewingRoutesStorage = useSetAtom(viewingRoutesAtom);
-
-  const isInViewingRoutesShared = useSharedValue(isInViewingRoutes ? 1 : 0.5);
+  const isInViewingRoutesShared = useSharedValue(isInViewingRoutes ? 1 : 0.3);
   // sync props to shared value
   useEffect(() => {
-    isInViewingRoutesShared.value = withTiming(isInViewingRoutes ? 1 : 0.5, {
+    isInViewingRoutesShared.value = withTiming(isInViewingRoutes ? 1 : 0.3, {
       duration: 150,
     });
   }, [isInViewingRoutesShared, isInViewingRoutes]);
-
   const isViewingOpacityStyles = useAnimatedStyle(() => ({
     opacity: isInViewingRoutesShared.value,
   }));
+  // #endregion
 
   // #region Left and Right actions
   const renderLeftActions = (_progress: number, dragX: Animated.Value) => {
@@ -208,16 +211,11 @@ export default function RouteRow(props: {
               if (isInViewingRoutes) {
                 // remove this route from the viewing routes
                 setIsInViewingRoutes(false);
-                setViewingRoutesStorage((prev) =>
-                  prev.filter((route) => route !== props.routeItem.num)
-                );
+                deleteViewingRoute(props.routeItem.num);
               } else {
                 // add this route to the viewing routes
                 setIsInViewingRoutes(true);
-                setViewingRoutesStorage((prev) => [
-                  ...prev,
-                  props.routeItem.num,
-                ]);
+                addViewingRoute(props.routeItem.num);
               }
             }
           })

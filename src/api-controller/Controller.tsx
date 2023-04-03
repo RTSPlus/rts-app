@@ -11,7 +11,7 @@ import { AppState, AppStateStatus, Platform } from "react-native";
 import { useAvailableRoutes } from "./useAvailableRoutes";
 import { getRoutePattern } from "../rts-api/rts";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 function onAppStateChange(status: AppStateStatus) {
   if (Platform.OS !== "web") {
