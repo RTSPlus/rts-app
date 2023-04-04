@@ -80,32 +80,6 @@ export async function apiRequest(
   });
 }
 
-export type RouteData = {
-  num: number;
-  name: string;
-  color: string;
-};
-
-export async function getRoutes() {
-  return new Promise<RouteData[]>((res, rej) => {
-    apiRequest(endpoints.GET_ROUTES)
-      .then((response) => response.json())
-      .then((data) => {
-        const routes = data["bustime-response"]["routes"];
-        res(
-          routes.map(
-            (rt: { [x: string]: any }): RouteData => ({
-              num: parseInt(rt["rt"], 10),
-              name: rt["rtnm"],
-              color: rt["rtclr"],
-            })
-          )
-        );
-      })
-      .catch((err) => rej(err));
-  });
-}
-
 const PROJECTED_DISTANCE_SCALING_FACTOR = 0.98;
 /**
  * Ensures PathPoint[] is sorted

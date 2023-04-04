@@ -1,4 +1,4 @@
-// #\\region Imports
+// #region Imports
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Polyline } from "react-native-maps";
@@ -6,11 +6,11 @@ import { hasPresentKey } from "ts-is-present";
 
 import VehicleMarker, { VehicleMarkerRef } from "./VehicleMarker";
 import { useVehicleLocations } from "./useVehicleLocations";
-import { useAvailableRoutes } from "../../api-controller/useAvailableRoutes";
+import { useAvailableRoutes } from "../../api-controller/useRoutes";
 import { getRoutePattern } from "../../rts-api/rts";
 import { Pattern } from "../../rts-api/types";
 import { feetToMeters } from "../../utils/utils";
-// #\\endregion
+// #endregion
 
 type Props = {
   selectedRoutes: number[];
@@ -66,7 +66,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
         }
       });
     });
-  }, [routePatternQueries]);
+  }, [pidToPatternsMap, routePatternQueries, routes]);
 
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
   const usedPathIDs = new Set(
@@ -120,7 +120,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
         });
       }
     });
-  }, [vehicleLocations]);
+  }, [pidToPatternsMap, vehicleLocations]);
 
   return (
     <>

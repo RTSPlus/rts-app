@@ -3,7 +3,6 @@ import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
 import * as Location from "expo-location";
 import { StatusBar } from "expo-status-bar";
-import { useSetAtom } from "jotai";
 import { NativeBaseProvider } from "native-base";
 import React, { useEffect, PropsWithChildren } from "react";
 import { LogBox, StyleSheet, View } from "react-native";
@@ -15,7 +14,7 @@ import {
 import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
 import MainSheet from "./components/MainSheet/MainSheet";
-import RTSMapView, { mapModeAtom } from "./components/RTSMapView/RTSMapView";
+import RTSMapView from "./components/RTSMapView/RTSMapView";
 import ModalController from "./components/modals/ModalController";
 
 LogBox.ignoreLogs([
@@ -48,26 +47,18 @@ function StatusBarBlurry() {
 }
 
 function App() {
-  const setMapMode = useSetAtom(mapModeAtom);
-
   // Location permissions effect
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         // Handle permission denied
-        return;
       }
 
       // const location = await Location.getCurrentPositionAsync({});
       // console.log(location);
     })();
   }, []);
-
-  // Set RTSMapView to non-empty on mount
-  useEffect(() => {
-    setMapMode({ mode: "SHOWING_ROUTES", routeNumbers: [20] });
-  }, [setMapMode]);
 
   return (
     <Providers>
