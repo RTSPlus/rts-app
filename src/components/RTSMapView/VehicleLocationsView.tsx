@@ -1,4 +1,4 @@
-// #\\region Imports
+// #region Imports
 import { useQueries } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Polyline } from "react-native-maps";
@@ -10,7 +10,7 @@ import { useAvailableRoutes } from "../../api-controller/useRoutes";
 import { getRoutePattern } from "../../rts-api/rts";
 import { Pattern } from "../../rts-api/types";
 import { feetToMeters } from "../../utils/utils";
-// #\\endregion
+// #endregion
 
 type Props = {
   selectedRoutes: number[];

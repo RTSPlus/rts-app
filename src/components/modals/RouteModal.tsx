@@ -1,7 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
 import { useSetAtom } from "jotai";
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -11,6 +13,8 @@ import { Text, StyleSheet, View } from "react-native";
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
 import { useRoute } from "../../api-controller/useRoutes";
+import getVehiclesOnRoute from "../../rts-api/getVehiclesOnRoutes";
+import { getRoutePattern } from "../../rts-api/rts";
 import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";
 
 export type RouteModalOpenPayload = {
@@ -60,6 +64,28 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
     [open]
   );
 
+  const { data: vehicles } = useQuery({
+    queryKey: ["vehicleLocation", routeNum],
+    queryFn: () => getVehiclesOnRoute(routeNum),
+  });
+
+  const { data: patterns } = useQuery({
+    queryKey: ["patterns", routeNum],
+    queryFn: () =>
+      getRoutePattern(routeNum, route?.name ?? "", route?.color ?? ""),
+    enabled: route !== undefined,
+  });
+
+  // print patterns in a useeffect
+  useEffect(() => {
+    console.log(patterns);
+  }, [patterns]);
+
+  // print data in a useeffect
+  useEffect(() => {
+    console.log(vehicles);
+  }, [vehicles]);
+
   return (
     <BaseModal
       titleText={`Route ${routeNum}`}
@@ -68,6 +94,12 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
       onClose={onClose}
     >
       <View style={styles.container}>
+        {vehicles?.map((vehicle) => (
+          <Text>
+            {vehicle.vid} - {patterns?.patterns[vehicle.pid].direction}
+          </Text>
+        ))}
+        <View style={{ height: 15 }} />
         <Text style={{ fontSize: 20 }}>Inbound</Text>
         <Text style={{ fontSize: 20 }}>Outbound</Text>
         <Text>Stops:</Text>

@@ -1,15 +1,15 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
+import { View, Text } from "react-native";
 import { MapMarkerProps, Marker } from "react-native-maps";
 import Animated, {
   useAnimatedReaction,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { G, Svg, Path } from "react-native-svg";
 
 import { projectPdistToPathPoint } from "../../rts-api/rts";
 import { PathPoint } from "../../rts-api/types";
-import { View, Text } from "react-native";
-import { G, Svg, Path } from "react-native-svg";
 
 export type VehicleMarkerProps = { path: PathPoint[] } & Omit<
   MapMarkerProps,
