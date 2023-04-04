@@ -97,6 +97,7 @@ export default function SearchViewBody(props: Props) {
             modalControllerDispatch({
               event: "OPEN_DESTINATION",
               payload: {
+                address: item.description,
                 title: item.terms[0].value,
               },
             });
@@ -120,6 +121,7 @@ export default function SearchViewBody(props: Props) {
                 event: "OPEN_DESTINATION",
                 payload: {
                   title: "Test",
+                  address: "Test",
                 },
               });
             }}
