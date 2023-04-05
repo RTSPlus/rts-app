@@ -1,3 +1,7 @@
+import { RTS_GOOGLE_API_KEY } from "@env";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import * as Location from "expo-location";
 import {
   forwardRef,
   useEffect,
@@ -8,17 +12,8 @@ import {
 import { FlatList, Text, View, StyleSheet } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
-import type { ModalControllerDispatchEvent } from "../modals/ModalController";
-import { RTS_GOOGLE_API_KEY } from "@env";
-import { set } from "react-native-reanimated";
-import { useQuery } from "@tanstack/react-query";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { MaterialIcons } from "@expo/vector-icons";
-
-const queryClient = new QueryClient();
-import * as Location from "expo-location";
 import { colors } from "../../colors";
+import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 
 export type DestinationModalOpenPayload = {
   title: string;
@@ -134,9 +129,10 @@ const BusDirections = ({
 
 const DestinationModal = forwardRef<DestinationModalRef, Props>(
   (props, ref) => {
-    const [destinationAddress, setDestinationAddress] = useState("");
-    const [originAddress, setOriginAddress] = useState("");
     const baseModalRef = useRef<BaseModalRef>(null);
+
+    const [originAddress, setOriginAddress] = useState("");
+    const [destinationAddress, setDestinationAddress] = useState("");
     const [destinationInfo, setDestionationInfo] = useState({
       title: "",
       address: "",
@@ -204,34 +200,40 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       getCurrentLocation();
       setDestinationAddress(destinationInfo.address);
       if (routeDirectionsQuery.isSuccess) {
-        console.log("Directions fetched successfully", routeDirectionsQuery.data);
+        console.log(
+          "Directions fetched successfully",
+          routeDirectionsQuery.data
+        );
       } else if (routeDirectionsQuery.isError) {
         console.error("Error fetching directions", routeDirectionsQuery.error);
       }
-    }, [destinationInfo.address, routeDirectionsQuery.isSuccess, routeDirectionsQuery.isError, routeDirectionsQuery.error]);
-    
+    }, [
+      destinationInfo.address,
+      routeDirectionsQuery.isSuccess,
+      routeDirectionsQuery.isError,
+      routeDirectionsQuery.error,
+      routeDirectionsQuery.data,
+    ]);
 
     return (
-      <QueryClientProvider client={queryClient}>
-        <BaseModal
-          ref={baseModalRef}
-          onClose={() =>
-            props.modalControllerDispatch({
-              event: "CLOSE_DESTINATION",
-            })
-          }
-        >
-          {routeDirectionsQuery.isLoading && <Text>Loading directions...</Text>}
-          {routeDirectionsQuery.isSuccess && (
-            <View>
+      <BaseModal
+        ref={baseModalRef}
+        onClose={() =>
+          props.modalControllerDispatch({
+            event: "CLOSE_DESTINATION",
+          })
+        }
+      >
+        {routeDirectionsQuery.isLoading && <Text>Loading directions...</Text>}
+        {routeDirectionsQuery.isSuccess && (
+          <View>
             <BusDirections
               directions={routeDirectionsQuery.data}
               destinationInfo={destinationInfo}
             />
-            </View>
-          )}
-        </BaseModal>
-      </QueryClientProvider>
+          </View>
+        )}
+      </BaseModal>
     );
   }
 );
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
     borderColor: colors.ios.light.gray["4"].toRgbString(),
     paddingVertical: 10,
     paddingHorizontal: 10,
-    width: '100%',
+    width: "100%",
   },
   directionHeader: {
     flexDirection: "row",
@@ -254,7 +256,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   directionHeaderText: {
-    width:'95%',
+    width: "95%",
     fontSize: 15,
     fontWeight: "bold",
     marginBottom: 5,
