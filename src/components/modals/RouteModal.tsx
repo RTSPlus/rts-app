@@ -12,7 +12,7 @@ import { Text, StyleSheet, View } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import type { ModalControllerDispatchEvent } from "./ModalController";
-import { useRoute } from "../../api-controller/useRoutes";
+import { useRoute } from "../../hooks/useRoutes";
 import getVehiclesOnRoute from "../../rts-api/getVehiclesOnRoutes";
 import { getRoutePattern } from "../../rts-api/rts";
 import { RTSMapViewMachineAtom } from "../RTSMapView/RTSMapView";

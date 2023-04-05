@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { queryClient } from "../../api-controller/Controller";
+import { queryClient } from "../QueryManager";
 
 const STORAGE_KEY_PREFIX = "map-preference";
 

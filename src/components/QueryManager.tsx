@@ -8,7 +8,7 @@ import {
 import { PropsWithChildren, useEffect } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 
-import { useAvailableRoutes } from "./useRoutes";
+import { useAvailableRoutes } from "../hooks/useRoutes";
 import { getRoutePattern } from "../rts-api/rts";
 
 export const queryClient = new QueryClient();
