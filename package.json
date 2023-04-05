@@ -10,7 +10,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "format": "prettier --write .",
-    "watchman-clear": "watchman watch-del './'; watchman watch-project './'",
+    "watchman-clear": "watchman watch-del './'; watchman watch-project './'"
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
