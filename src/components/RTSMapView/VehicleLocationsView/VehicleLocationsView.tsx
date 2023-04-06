@@ -4,12 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { Polyline } from "react-native-maps";
 import { hasPresentKey } from "ts-is-present";
 
-import VehicleMarker, { VehicleMarkerRef } from "../VehicleMarker";
-import { useVehicleLocations } from "../useVehicleLocations";
+import RoutesDisplay from "./RoutesDisplay";
 import { useAvailableRoutes } from "../../../hooks/useRoutes";
 import { getRoutePattern } from "../../../rts-api/rts";
 import { Pattern } from "../../../rts-api/types";
 import { feetToMeters } from "../../../utils/utils";
+import VehicleMarker, { VehicleMarkerRef } from "../VehicleMarker";
+import { useVehicleLocations } from "../useVehicleLocations";
 // #endregion
 
 type Props = {
@@ -69,8 +70,8 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
   }, [pidToPatternsMap, routePatternQueries, routes]);
 
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
-  const usedPathIDs = new Set(
-    vehicleLocations.flatMap((e) => (e.data ?? []).map((v) => v.pid))
+  const usedPathIDs = vehicleLocations.flatMap((e) =>
+    (e.data ?? []).map((v) => v.pid)
   );
 
   // Vehicle animation handling
@@ -125,22 +126,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
   return (
     <>
       {/* Draw patterns */}
-      {routes.flatMap((rt) =>
-        Object.values(rt.patterns)
-          .filter((path) => usedPathIDs.has(path.id))
-          .map(({ path, id }) => (
-            <Polyline
-              key={id}
-              coordinates={path.map((pt) => ({
-                latitude: pt.lat,
-                longitude: pt.lon,
-              }))}
-              strokeColor={rt.color}
-              strokeColors={[rt.color]}
-              strokeWidth={3}
-            />
-          ))
-      )}
+      <RoutesDisplay routes={routes} usedPathIDs={usedPathIDs} />
 
       {/* Draw vehicle locations */}
       {/* {vehicleLocations
