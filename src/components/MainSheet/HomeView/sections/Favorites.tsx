@@ -5,6 +5,7 @@ import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
 import { routesShortName } from "../../../../rts-api/routesMeta";
 import { dispatch } from "../../../modals/ModalController";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 
 type FavoritesItemsType = {
   type: "ROUTE";
@@ -91,7 +92,13 @@ export default function Favorites() {
   return (
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionTitle}>Favorites</Text>
-      <View style={styles.sectionBody}>{favoritesComponents}</View>
+      <BottomSheetScrollView
+        horizontal
+        contentContainerStyle={styles.sectionBodyContainer}
+        style={styles.sectionBody}
+      >
+        {favoritesComponents}
+      </BottomSheetScrollView>
     </View>
   );
 }
@@ -105,16 +112,18 @@ const styles = StyleSheet.create({
     color: "rgba(0,0,0,0.6)",
   },
 
-  sectionBody: {
-    marginTop: 12,
-
-    height: 140,
-    borderRadius: 10,
+  sectionBodyContainer: {
     backgroundColor: "white",
 
     alignItems: "center",
     flexDirection: "row",
+    height: 140,
+  },
+  sectionBody: {
+    borderRadius: 10,
+    backgroundColor: "white",
 
+    marginTop: 12,
     paddingLeft: 12,
   },
 });
