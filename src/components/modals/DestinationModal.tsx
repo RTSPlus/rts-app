@@ -1,18 +1,12 @@
 import { RTS_GOOGLE_API_KEY } from "@env";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import * as Location from "expo-location";
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { FlatList, Text, View, StyleSheet } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import { colors } from "../../colors";
+import useLocation from "../../hooks/useLocation";
 import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 
 export type DestinationModalOpenPayload = {
@@ -127,60 +121,44 @@ const BusDirections = ({
   );
 };
 
+function getDirections(
+  origin: { lat: number; lng: number },
+  destination: string
+) {
+  console.log(origin, destination);
+
+  return new Promise((res, rej) => {
+    fetch(
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination}&mode=transit&transit_mode=bus&key=${RTS_GOOGLE_API_KEY}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        // res(data);
+        res(data?.routes[0]?.legs[0]?.steps);
+      })
+      .catch(rej);
+  });
+}
+
 const DestinationModal = forwardRef<DestinationModalRef, Props>(
   (props, ref) => {
     const baseModalRef = useRef<BaseModalRef>(null);
 
-    const [originAddress, setOriginAddress] = useState("");
-    const [destinationAddress, setDestinationAddress] = useState("");
-    const [destinationInfo, setDestionationInfo] = useState({
-      title: "",
-      address: "",
+    const { location } = useLocation({});
+    const [destinationInfo, setDestionationInfo] = useState<{
+      title: string;
+      address: string;
+    } | null>(null);
+
+    const { data: directions, isLoading } = useQuery({
+      queryKey: ["directions", location, destinationInfo],
+      queryFn: () =>
+        getDirections(
+          { lat: location!.coords.latitude, lng: location!.coords.longitude },
+          destinationInfo!.address
+        ),
+      enabled: location !== null && destinationInfo !== null,
     });
-
-    const getCurrentLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          console.error("Location permission not granted");
-          return;
-        }
-        const location = await Location.getCurrentPositionAsync({});
-        setOriginAddress(
-          `${location.coords.latitude},${location.coords.longitude}`
-        );
-        return location;
-      } catch (error) {
-        console.error(error);
-        return null;
-      }
-    };
-
-    const getDirections = async (origin: any, destination: any) => {
-      try {
-        const response = await fetch(
-          `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&mode=transit&transit_mode=bus&key=${RTS_GOOGLE_API_KEY}`
-        );
-        const data = await response.json();
-        return data?.routes[0]?.legs[0]?.steps;
-      } catch (error) {
-        console.error(error);
-        return [];
-      }
-    };
-    const useDirectionsQuery = (origin: any, destination: any) => {
-      return useQuery(
-        ["directions", origin, destination],
-        () => getDirections(origin, destination),
-        {
-          enabled: !!origin && !!destination,
-        }
-      );
-    };
-    const routeDirectionsQuery = useDirectionsQuery(
-      originAddress,
-      destinationAddress
-    );
 
     useImperativeHandle(
       ref,
@@ -196,25 +174,6 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       []
     );
 
-    useEffect(() => {
-      getCurrentLocation();
-      setDestinationAddress(destinationInfo.address);
-      if (routeDirectionsQuery.isSuccess) {
-        console.log(
-          "Directions fetched successfully",
-          routeDirectionsQuery.data
-        );
-      } else if (routeDirectionsQuery.isError) {
-        console.error("Error fetching directions", routeDirectionsQuery.error);
-      }
-    }, [
-      destinationInfo.address,
-      routeDirectionsQuery.isSuccess,
-      routeDirectionsQuery.isError,
-      routeDirectionsQuery.error,
-      routeDirectionsQuery.data,
-    ]);
-
     return (
       <BaseModal
         ref={baseModalRef}
@@ -224,11 +183,11 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
           })
         }
       >
-        {routeDirectionsQuery.isLoading && <Text>Loading directions...</Text>}
-        {routeDirectionsQuery.isSuccess && (
+        {isLoading && <Text>Loading directions...</Text>}
+        {directions && (
           <View>
             <BusDirections
-              directions={routeDirectionsQuery.data}
+              directions={directions}
               destinationInfo={destinationInfo}
             />
           </View>
