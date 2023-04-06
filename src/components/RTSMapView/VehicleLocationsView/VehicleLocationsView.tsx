@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { Polyline } from "react-native-maps";
 import { hasPresentKey } from "ts-is-present";
 
-import VehicleMarker, { VehicleMarkerRef } from "./VehicleMarker";
-import { useVehicleLocations } from "./useVehicleLocations";
-import { useAvailableRoutes } from "../../hooks/useRoutes";
-import { getRoutePattern } from "../../rts-api/rts";
-import { Pattern } from "../../rts-api/types";
-import { feetToMeters } from "../../utils/utils";
+import VehicleMarker, { VehicleMarkerRef } from "../VehicleMarker";
+import { useVehicleLocations } from "../useVehicleLocations";
+import { useAvailableRoutes } from "../../../hooks/useRoutes";
+import { getRoutePattern } from "../../../rts-api/rts";
+import { Pattern } from "../../../rts-api/types";
+import { feetToMeters } from "../../../utils/utils";
 // #endregion
 
 type Props = {
@@ -74,53 +74,53 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
   );
 
   // Vehicle animation handling
-  useEffect(() => {
-    // Filter out queries that don't have data. Merge data with last updated time
-    const vehicleLocationsData = vehicleLocations.flatMap((query) =>
-      (query.data ?? []).map((e) => ({
-        ...e,
-        lastUpdatedAt: query.dataUpdatedAt,
-      }))
-    );
+  // useEffect(() => {
+  //   // Filter out queries that don't have data. Merge data with last updated time
+  //   const vehicleLocationsData = vehicleLocations.flatMap((query) =>
+  //     (query.data ?? []).map((e) => ({
+  //       ...e,
+  //       lastUpdatedAt: query.dataUpdatedAt,
+  //     }))
+  //   );
 
-    // Vehicle animation handled here
-    // Check if vehicle location has been updated
-    vehicleLocationsData.forEach((vehicle) => {
-      // check last updated map and add if not present
-      const lastUpdatedMap = vehicleLocationLastUpdated.current;
-      if (!lastUpdatedMap.has(vehicle.vid)) {
-        lastUpdatedMap.set(vehicle.vid, {
-          lastUpdatedAt: vehicle.lastUpdatedAt,
-          pdist: vehicle.pdist,
-        });
-      }
+  //   // Vehicle animation handled here
+  //   // Check if vehicle location has been updated
+  //   vehicleLocationsData.forEach((vehicle) => {
+  //     // check last updated map and add if not present
+  //     const lastUpdatedMap = vehicleLocationLastUpdated.current;
+  //     if (!lastUpdatedMap.has(vehicle.vid)) {
+  //       lastUpdatedMap.set(vehicle.vid, {
+  //         lastUpdatedAt: vehicle.lastUpdatedAt,
+  //         pdist: vehicle.pdist,
+  //       });
+  //     }
 
-      const vehicleLastUpdate = lastUpdatedMap.get(vehicle.vid);
-      if (
-        vehicleLastUpdate !== undefined &&
-        vehicleLastUpdate.pdist !== vehicle.pdist
-      ) {
-        const path = pidToPatternsMap.get(vehicle.pid)?.path;
-        if (path === undefined) {
-          throw new Error(`Path for pid ${vehicle.pid} not found`);
-        }
+  //     const vehicleLastUpdate = lastUpdatedMap.get(vehicle.vid);
+  //     if (
+  //       vehicleLastUpdate !== undefined &&
+  //       vehicleLastUpdate.pdist !== vehicle.pdist
+  //     ) {
+  //       const path = pidToPatternsMap.get(vehicle.pid)?.path;
+  //       if (path === undefined) {
+  //         throw new Error(`Path for pid ${vehicle.pid} not found`);
+  //       }
 
-        // Animate marker
-        vehicleMarkerRefMap.current
-          .get(vehicle.vid)
-          ?.animatedPdist(
-            feetToMeters(vehicle.pdist),
-            vehicle.lastUpdatedAt - vehicleLastUpdate.lastUpdatedAt
-          );
+  //       // Animate marker
+  //       vehicleMarkerRefMap.current
+  //         .get(vehicle.vid)
+  //         ?.animatedPdist(
+  //           feetToMeters(vehicle.pdist),
+  //           vehicle.lastUpdatedAt - vehicleLastUpdate.lastUpdatedAt
+  //         );
 
-        // update last updated time and values
-        lastUpdatedMap.set(vehicle.vid, {
-          lastUpdatedAt: vehicle.lastUpdatedAt,
-          pdist: vehicle.pdist,
-        });
-      }
-    });
-  }, [pidToPatternsMap, vehicleLocations]);
+  //       // update last updated time and values
+  //       lastUpdatedMap.set(vehicle.vid, {
+  //         lastUpdatedAt: vehicle.lastUpdatedAt,
+  //         pdist: vehicle.pdist,
+  //       });
+  //     }
+  //   });
+  // }, [pidToPatternsMap, vehicleLocations]);
 
   return (
     <>
@@ -143,7 +143,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
       )}
 
       {/* Draw vehicle locations */}
-      {vehicleLocations
+      {/* {vehicleLocations
         .flatMap((e) => e.data ?? [])
         .filter((vehicle) => pidToPatternsMap.get(vehicle.pid)?.path)
         .map((vehicle) => (
@@ -162,7 +162,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
             description={vehicle.des}
             path={pidToPatternsMap.get(vehicle.pid)?.path ?? []}
           />
-        ))}
+        ))} */}
     </>
   );
 }

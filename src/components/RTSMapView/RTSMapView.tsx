@@ -9,7 +9,7 @@ import MapViewDirections from "react-native-maps-directions";
 import { match } from "ts-pattern";
 import { createMachine, assign } from "xstate";
 
-import VehicleLocationsView from "./VehicleLocationsView";
+import VehicleLocationsView from "./VehicleLocationsView/VehicleLocationsView";
 import { readViewingRoutes } from "./mapPreferences";
 
 // test route
