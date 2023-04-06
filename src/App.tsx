@@ -1,19 +1,19 @@
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { registerRootComponent } from "expo";
 import { BlurView } from "expo-blur";
-import * as Location from "expo-location";
+import { useForegroundPermissions } from "expo-location";
 import { StatusBar } from "expo-status-bar";
 import { NativeBaseProvider } from "native-base";
-import React, { useEffect, PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 import { LogBox, StyleSheet, View } from "react-native";
 import {
   SafeAreaInsetsContext,
   SafeAreaProvider,
 } from "react-native-safe-area-context";
 
-import { ControllerProvider } from "./api-controller/Controller";
 import { colors } from "./colors";
 import MainSheet from "./components/MainSheet/MainSheet";
+import { ControllerProvider } from "./components/QueryManager";
 import RTSMapView from "./components/RTSMapView/RTSMapView";
 import ModalController from "./components/modals/ModalController";
 
@@ -47,18 +47,8 @@ function StatusBarBlurry() {
 }
 
 function App() {
-  // Location permissions effect
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        // Handle permission denied
-      }
-
-      // const location = await Location.getCurrentPositionAsync({});
-      // console.log(location);
-    })();
-  }, []);
+  // TODO: Handle permission denied
+  useForegroundPermissions();
 
   return (
     <Providers>
