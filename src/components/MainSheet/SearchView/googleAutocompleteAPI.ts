@@ -1,5 +1,7 @@
 import { RTS_GOOGLE_API_KEY } from "@env";
 import { z } from "zod";
+// const : string = "AIzaSyAF6id2KmOvi5pPEwX8E4EEMpGXemMlx5E";
+
 
 const PlacePredictionSchema = z.object({
   description: z.string(),

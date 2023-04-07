@@ -1,7 +1,7 @@
 import { RTS_GOOGLE_API_KEY } from "@env";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
   FlatList,
   Text,
@@ -18,6 +18,12 @@ import type { ModalControllerDispatchEvent } from "../modals/ModalController";
 import { NullLiteral } from "typescript";
 import getVehiclesOnRoute from "../../rts-api/getVehiclesOnRoutes";
 import { getRoutePattern } from "../../rts-api/rts";
+import {
+  addViewingRoute,
+  deleteViewingRoute,
+} from "../RTSMapView/mapPreferences";
+
+
 
 export type DestinationModalOpenPayload = {
   title: string;
@@ -141,6 +147,11 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     const [endLng, setEndLng] = useState<number>(0);
     const [short_name, setShortName] = useState<number>(0);
 
+    useEffect(() => {
+
+      addViewingRoute(short_name);
+    }, [short_name])
+
     const { data: vehicles } = useQuery({
       queryKey: ["vehicleLocation", short_name],
       queryFn: () => getVehiclesOnRoute(short_name),
@@ -158,7 +169,7 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       // lat lon of start stop
       // lat lon of end stop
       // get list of pattern ids on route
-      // Get stops from endoint 
+      // Get stops from endoint
       // Get psngld, pdist, hour of day
       const now = new Date();
       const currentHour = now.getHours();
@@ -168,10 +179,38 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
 
 
 
-      const origin = await getNearestStop(startLat, startLng, 447);
-      const destination = await getNearestStop(endLat, endLng, 447);
-      getTimeTil("323", "335", 2000, origin, "HALF_EMPTY", 9);
-      getDuration("323", "335", origin, destination, "HALF_EMPTY", 9);
+      if(vehicles && patterns) {
+        const pids = Object.keys(patterns["patterns"]);
+        // for(let idx = 0; idx < pids.length; idx ++) {
+        //   pids[idx] = parseInt(pids[idx])
+        // }
+        const origin = await getNearestStop(startLng, startLat, pids);
+        const destination = await getNearestStop(endLng, endLat, pids);
+        const psngld = vehicles[0]["psgld"];
+        const pdist = vehicles[0]["pdist"];
+        const buspid = vehicles[0]["pid"]
+        if(buspid) {
+          if(buspid === pids[0]) {
+            await getTimeTil(pids[0],pids[1],pdist,origin[1]["stop_id"], psngld, currentHour.toString() );
+          } else {
+            await getTimeTil(pids[1],pids[0],pdist,origin[1]["stop_id"], psngld, currentHour.toString() );
+          }
+
+          if(origin[0] === pids[0]) {
+            await getDuration(pids[0],pids[1], origin[1]["stop_id"], destination[1]["stop_id"], psngld, currentHour.toString())
+          } else {
+            await getDuration(pids[1],pids[0], origin[1]["stop_id"], destination[1]["stop_id"], psngld, currentHour.toString())
+          }
+
+        }
+        // start_payload = {"pattern_id_one":'335', "pattern_id_two": '323', "pdist":2000, "start_id":'0200', "passenger_load":'HALF_EMPTY', "hour_of_day":'05'}
+
+      }
+
+      // const origin = await getNearestStop(startLat, startLng, 447);
+      // const destination = await getNearestStop(endLat, endLng, 447);
+      // getTimeTil("323", "335", 2000, origin, "HALF_EMPTY", 9);
+      // getDuration("323", "335", origin, destination, "HALF_EMPTY", 9);
     }
 
     // Route id is from Google maps API.
@@ -179,7 +218,8 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
     // Google gives route suggestions.
     // The route id is the bus number
 
-    async function getNearestStop(lat: number, lon: number, pid: number) {
+    async function getNearestStop(lon: number, lat: number, pids: string[]) {
+
       try {
         const res = await fetch("http://52.91.201.55/nearest", {
           method: "POST",
@@ -187,14 +227,14 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            lat: lat,
-            lon: lon,
-            pid: pid,
+            "lon": lon,
+            "lat" : lat,
+            "pid" : pids
           }),
         });
 
         const data = await res.json();
-        console.log(data);
+        return data;
       } catch (error) {
         console.log(error);
       }
@@ -208,24 +248,26 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       passenger_load: string,
       hour_of_day: number
     ) {
+
       try {
-        const res = await fetch("http://52.91.201.55/predict/end ", {
+        const res = await fetch("http://52.91.201.55/predict/stop", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            pattern_id_one: pattern_id_one,
-            pattern_id_two: pattern_id_two,
-            start_id: start_id,
-            stop_id: stop_id,
-            passenger_load: passenger_load,
-            hour_of_day: hour_of_day,
+            "pattern_id_one": pattern_id_one,
+            "pattern_id_two": pattern_id_two,
+            "start_id": start_id,
+            "stop_id": stop_id,
+            "passenger_load": passenger_load,
+            "hour_of_day": hour_of_day,
           }),
         });
 
         const data = await res.json();
-        console.log(data);
+        console.log(data)
+
         setDuration(Math.round(parseInt(data["bus_to_end"]) / 60).toString());
       } catch (error) {
         console.log(error);
@@ -238,26 +280,35 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       pdist: number,
       start_id: string,
       passenger_load: string,
-      hour_of_day: number,
+      hour_of_day: number
     ) {
+      console.log( "HERE", {
+        "pattern_id_one": pattern_id_one,
+        "pattern_id_two": pattern_id_two,
+        "start_id": start_id,
+        "pdist": pdist,
+        "passenger_load": passenger_load,
+        "hour_of_day": hour_of_day
+      })
       try {
-        const res = await fetch("http://52.91.201.55/predict/start ", {
+        const res = await fetch("http://52.91.201.55/predict/start", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            pattern_id_one: pattern_id_one,
-            pattern_id_two: pattern_id_two,
-            start_id: start_id,
-            pdist: pdist,
-            passenger_load: passenger_load,
-            hour_of_day: hour_of_day,
+            "pattern_id_one": pattern_id_one,
+            "pattern_id_two": pattern_id_two,
+            "start_id": start_id,
+            "pdist": pdist,
+            "passenger_load": passenger_load,
+            "hour_of_day": hour_of_day
           }),
         });
 
         const data = await res.json();
         console.log(data);
+
         setTimeToArrival(
           Math.round(parseInt(data["bus_to_start"]) / 60).toString()
         );
@@ -265,16 +316,16 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         console.log(error);
       }
     }
-    
+
     function getDirections(
   origin: { lat: number; lng: number },
   destination: string
 ) {
-  console.log(origin, destination);
+
 
   // Redpoint Gainesville
-  origin = { lat: 29.641270630561376, lng: -82.39523577496786 };
-  destination = "444 Newell Dr, Gainesville, FL 32611";
+  // origin = { lat: 29.641270630561376, lng: -82.39523577496786 };
+  // destination = "444 Newell Dr, Gainesville, FL 32611";
 
 
   return new Promise((res, rej) => {
@@ -288,13 +339,24 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         const steps = data?.routes[0]?.legs[0]?.steps;
         if (steps && steps.length > 0) {
           const startLocation = steps[0].start_location;
-          const endLocation = steps[steps.length - 1].end_location;
 
+          const endLocation = steps[steps.length - 1].end_location;
           setStartLat(startLocation.lat);
           setStartLng(startLocation.lng);
           setEndLat(endLocation.lat);
           setEndLng(endLocation.lng);
-          setShortName(parseInt(steps[0].transit_details.line.short_name));
+          // deleteViewingRoute(short_name)
+
+          for(let step of steps) {
+
+            if(step["travel_mode"] === "TRANSIT") {
+              if(short_name != parseInt(step.transit_details.line.short_name)) {
+                deleteViewingRoute(short_name)
+              }
+
+              setShortName(parseInt(step.transit_details.line.short_name));
+            }
+          }
         }
       })
       .catch(rej);
