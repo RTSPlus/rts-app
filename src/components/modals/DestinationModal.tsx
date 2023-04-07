@@ -2,7 +2,7 @@ import { RTS_GOOGLE_API_KEY } from "@env";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { FlatList, Text, View, StyleSheet } from "react-native";
+import { FlatList, Text, View, StyleSheet, TouchableOpacity, Button } from "react-native";
 
 import BaseModal, { BaseModalRef } from "./BaseModal";
 import { colors } from "../../colors";
@@ -127,6 +127,11 @@ function getDirections(
 ) {
   console.log(origin, destination);
 
+  // Redpoint Gainesville
+  origin = { lat:   29.641270630561376, lng: -82.39523577496786 };
+  
+  destination = "444 Newell Dr, Gainesville, FL 32611";
+
   return new Promise((res, rej) => {
     fetch(
       `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.lat},${origin.lng}&destination=${destination}&mode=transit&transit_mode=bus&key=${RTS_GOOGLE_API_KEY}`
@@ -142,7 +147,71 @@ function getDirections(
 
 const DestinationModal = forwardRef<DestinationModalRef, Props>(
   (props, ref) => {
+
+    function handleGetPredictions(){
+      // mock data
+      getNearestStop(29.6389571466187, -82.34512108381777, 447);
+      getPredictions("323", "335", "0175", "0200", "HALF_EMPTY", 2000, 9);
+    }
+
+// Route id is from Google maps API. 
+// User says where they are , where they want to go.
+// Google gives route suggestions. 
+// The route id is the bus number
+
+async function getNearestStop(lat:number, lon:number, pid:number) {
+  try {
+    const res = await fetch("http://52.91.201.55/nearest", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+      lat: lat,
+      lon: lon,
+      pid: pid
+      })
+    });
+
+    const data = await res.json();
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+async function getPredictions(pattern_id_one:string, pattern_id_two:string, start_id:string, stop_id:string, passenger_load:string, pdist:number, hour_of_day:number) {
+  try {
+    const res = await fetch("http://52.91.201.55/predict", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+      pattern_id_one: pattern_id_one,
+      pattern_id_two: pattern_id_two,
+      start_id: start_id,
+      stop_id: stop_id,
+      passenger_load: passenger_load,
+      pdist: pdist,
+      hour_of_day: hour_of_day
+      })
+    });
+
+    const data = await res.json();
+    console.log(data);
+    setTimeToArrival((Math.round(parseInt(data['bus_to_start'])/60).toString()))
+    setDuration((Math.round(parseInt(data['bus_to_end'])/60).toString()))
+  } catch (error) {
+    console.log(error);
+  }
+}
+
     const baseModalRef = useRef<BaseModalRef>(null);
+    const [timeToArrival, setTimeToArrival] = useState<string>('');
+    const [duration, setDuration] = useState<string>('');
+
 
     const { location } = useLocation({});
     const [destinationInfo, setDestionationInfo] = useState<{
@@ -192,6 +261,10 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
             />
           </View>
         )}
+
+        <Button onPress={handleGetPredictions} title="Get Prediction"/>
+        <Text>Time to arrival: {timeToArrival} minutes</Text>
+        <Text>Duration: {duration} minutes</Text>
       </BaseModal>
     );
   }
