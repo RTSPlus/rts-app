@@ -12,6 +12,7 @@ import { createMachine, assign } from "xstate";
 import VehicleLocationsView from "./VehicleLocationsView/VehicleLocationsView";
 import { readViewingRoutes } from "./mapPreferences";
 
+
 // test route
 const origin = { latitude: 29.721175, longitude: -82.363335 };
 const destination = { latitude: 29.6481658, longitude: -82.3454982 };
@@ -103,7 +104,7 @@ export default function RTSMapView(props: ViewProps) {
       {...props}
       initialRegion={initialRegion}
       showsUserLocation
-      followsUserLocation
+      followsUserLocation={false}
     >
       {match(mapViewState.value as RTSMapViewMachineStates)
         .with("empty", () => <></>)

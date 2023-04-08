@@ -27,6 +27,8 @@ import CustomRouteIcon from "../../CustomRouteIcon";
 import DetailedRouteView from "../../DetailedRouteView";
 import { FlatList } from "react-native";
 
+
+
 const BusDirections = ({ directions }: { directions: any }) => {
   if (!directions) {
     return <Text>Loading directions...</Text>;
@@ -130,7 +132,7 @@ const HomeView = () => {
           <Container style={styles.container}>
             <Box borderX="1" borderRadius="md">
               <VStack space="2" alignItems="center">
-                {/* 
+                {/*
                 Google Places Autocomplete and Bus Information Button View
               */}
                 <View style={styles.container}>
@@ -211,7 +213,7 @@ const HomeView = () => {
                     </ScrollView>
                   )}
                 </View>
-                {/* 
+                {/*
                 Favorites container header and more button
               */}
                 <HStack width="90%" space="75%">
@@ -234,7 +236,7 @@ const HomeView = () => {
                   </TouchableOpacity>
                 </HStack>
 
-                {/* 
+                {/*
                 Favorites information container
               */}
                 <Box
@@ -288,7 +290,7 @@ const HomeView = () => {
                   </HStack>
                 </Box>
 
-                {/* 
+                {/*
                 Routes near you header and all routes button
               */}
                 <HStack width="90%" space="45%">
@@ -313,7 +315,7 @@ const HomeView = () => {
                   </TouchableOpacity>
                 </HStack>
 
-                {/* 
+                {/*
                 Routes Information Container
               */}
                 <Box
