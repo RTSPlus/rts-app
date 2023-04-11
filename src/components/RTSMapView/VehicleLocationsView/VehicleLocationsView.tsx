@@ -1,14 +1,13 @@
 // #region Imports
 import { useQueries } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { hasPresentKey } from "ts-is-present";
 
 import RoutesDisplay from "./RoutesDisplay";
+import VehicleMarkerDisplay from "./VehicleMarkerDisplay";
 import { useAvailableRoutes } from "../../../hooks/useRoutes";
 import { getRoutePattern } from "../../../rts-api/rts";
 import { Pattern, Route } from "../../../rts-api/types";
-import { feetToMeters } from "../../../utils/utils";
-import VehicleMarker, { VehicleMarkerRef } from "../VehicleMarker";
 import { useVehicleLocations } from "../useVehicleLocations";
 // #endregion
 
@@ -17,11 +16,6 @@ type Props = {
 };
 
 export default function VehicleLocationsView({ selectedRoutes }: Props) {
-  const vehicleLocationLastUpdated = useRef<
-    Map<number, { lastUpdatedAt: number; pdist: number }>
-  >(new Map());
-  const vehicleMarkerRefMap = useRef<Map<number, VehicleMarkerRef>>(new Map());
-
   const { data: availableRoutes } = useAvailableRoutes();
 
   // Intersection of selectedRoutes and availableRoutes
@@ -70,88 +64,21 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
   }, [routePatternQueries, routes]);
   // #endregion
 
-  // ------------------------------------------- TODO: abstract this out -------------------------------------------
   const vehicleLocations = useVehicleLocations(availableSelectedRoutes);
   const usedPathIDs = vehicleLocations.flatMap((e) =>
     (e.data ?? []).map((v) => v.pid)
   );
-
-  // Vehicle animation handling
-  useEffect(() => {
-    // Filter out queries that don't have data. Merge data with last updated time
-    const vehicleLocationsData = vehicleLocations.flatMap((query) =>
-      (query.data ?? []).map((e) => ({
-        ...e,
-        lastUpdatedAt: query.dataUpdatedAt,
-      }))
-    );
-
-    // Vehicle animation handled here
-    // Check if vehicle location has been updated
-    vehicleLocationsData.forEach((vehicle) => {
-      // check last updated map and add if not present
-      const lastUpdatedMap = vehicleLocationLastUpdated.current;
-      if (!lastUpdatedMap.has(vehicle.vid)) {
-        lastUpdatedMap.set(vehicle.vid, {
-          lastUpdatedAt: vehicle.lastUpdatedAt,
-          pdist: vehicle.pdist,
-        });
-      }
-
-      const vehicleLastUpdate = lastUpdatedMap.get(vehicle.vid);
-      if (
-        vehicleLastUpdate !== undefined &&
-        vehicleLastUpdate.pdist !== vehicle.pdist
-      ) {
-        const path = pidToPatternsMap.current.get(vehicle.pid)?.path;
-        if (path === undefined) {
-          throw new Error(`Path for pid ${vehicle.pid} not found`);
-        }
-
-        // Animate marker
-        vehicleMarkerRefMap.current
-          .get(vehicle.vid)
-          ?.animatedPdist(
-            feetToMeters(vehicle.pdist),
-            vehicle.lastUpdatedAt - vehicleLastUpdate.lastUpdatedAt
-          );
-
-        // update last updated time and values
-        lastUpdatedMap.set(vehicle.vid, {
-          lastUpdatedAt: vehicle.lastUpdatedAt,
-          pdist: vehicle.pdist,
-        });
-      }
-    });
-  }, [pidToPatternsMap, vehicleLocations]);
 
   return (
     <>
       {/* Draw patterns */}
       <RoutesDisplay routes={routes} usedPathIDs={usedPathIDs} />
 
-      {/* Draw vehicle locations */}
-      {vehicleLocations
-        .flatMap((e) => e.data ?? [])
-        .filter((vehicle) => pidToPatternsMap.current.get(vehicle.pid)?.path)
-        .map((vehicle) => (
-          <VehicleMarker
-            color={patternsToRouteMap.current.get(vehicle.pid)?.color ?? "#000"}
-            key={vehicle.vid}
-            ref={(ref) => {
-              if (
-                ref !== null &&
-                !vehicleMarkerRefMap.current.has(vehicle.vid)
-              ) {
-                vehicleMarkerRefMap.current.set(vehicle.vid, ref);
-                ref.setInitialPdist(feetToMeters(vehicle.pdist));
-              }
-            }}
-            title={vehicle.vid.toString()}
-            description={vehicle.des}
-            path={pidToPatternsMap.current.get(vehicle.pid)?.path ?? []}
-          />
-        ))}
+      <VehicleMarkerDisplay
+        availableSelectedRoutes={availableSelectedRoutes}
+        pidToPatternsMap={pidToPatternsMap.current}
+        patternsToRouteMap={patternsToRouteMap.current}
+      />
     </>
   );
 }
