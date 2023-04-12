@@ -71,9 +71,7 @@ export default function VehicleLocationsView({ selectedRoutes }: Props) {
 
   return (
     <>
-      {/* Draw patterns */}
       <RoutesDisplay routes={routes} usedPathIDs={usedPathIDs} />
-
       <VehicleMarkerDisplay
         availableSelectedRoutes={availableSelectedRoutes}
         pidToPatternsMap={pidToPatternsMap.current}

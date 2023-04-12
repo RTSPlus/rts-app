@@ -77,8 +77,9 @@ export default function VehicleMarkerDisplay(props: Props) {
         .filter((vehicle) => props.pidToPatternsMap.get(vehicle.pid)?.path)
         .map((vehicle) => (
           <VehicleMarker
-            color={props.patternsToRouteMap.get(vehicle.pid)?.color ?? "#000"}
             key={vehicle.vid}
+            direction={props.pidToPatternsMap.get(vehicle.pid)?.direction}
+            color={props.patternsToRouteMap.get(vehicle.pid)?.color ?? "#000"}
             ref={(ref) => {
               if (
                 ref !== null &&
