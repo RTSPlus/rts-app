@@ -83,7 +83,7 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
 
   // print data in a useeffect
   useEffect(() => {
-    console.log(vehicles);
+    console.log("Vehics", vehicles);
   }, [vehicles]);
 
   return (
@@ -94,15 +94,24 @@ const RouteModal = forwardRef<RouteModalRef, Props>((props, ref) => {
       onClose={onClose}
     >
       <View style={styles.container}>
+        <Text style={{fontSize: 20}}> Busses currently running </Text>
         {vehicles?.map((vehicle) => (
+          <View style={{padding: 20, margin: 20, backgroundColor: "lightblue", borderRadius: 25}}>
           <Text>
-            {vehicle.vid} - {patterns?.patterns[vehicle.pid].direction}
+              <Text style={{fontWeight: "bold"}}>Direction:</Text>  <Text>{patterns?.patterns[vehicle.pid].direction}</Text>
           </Text>
+          <Text>
+              <Text style={{fontWeight: "bold"}}>Destination:</Text> <Text>{vehicle.des}</Text>
+          </Text>
+          <Text>
+              <Text style={{fontWeight: "bold"}}>Passenger Load:</Text> <Text>{vehicle.psgld.toLowerCase().replace('_', ' ')}</Text>
+          </Text>
+          </View>
         ))}
         <View style={{ height: 15 }} />
-        <Text style={{ fontSize: 20 }}>Inbound</Text>
+        {/* <Text style={{ fontSize: 20 }}>Inbound</Text>
         <Text style={{ fontSize: 20 }}>Outbound</Text>
-        <Text>Stops:</Text>
+        <Text>Stops:</Text> */}
       </View>
     </BaseModal>
   );

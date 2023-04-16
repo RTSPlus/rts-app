@@ -62,7 +62,7 @@ const SearchItem = (props: {
       {props.icon}
       <View style={styles.searchItemContent}>
         <Text style={styles.searchItemTitle}>{props.title}</Text>
-        <Text style={styles.searchItemDesc}>0.5mi · {props.description}</Text>
+        {/* <Text style={styles.searchItemDesc}>0.5mi · {props.description}</Text> */}
       </View>
     </TouchableOpacity>
   );
@@ -81,6 +81,7 @@ export default function SearchViewBody(props: Props) {
     queryFn: () => googleAutocomplete(debouncedSearchQuery),
     enabled: debouncedSearchQuery.length > 0,
   });
+
 
   const results: { item: JSX.Element; key: string }[] = [
     // Google autocomplete items
@@ -107,27 +108,27 @@ export default function SearchViewBody(props: Props) {
     })),
 
     // Placeholder items
-    ...Array(debouncedSearchQuery.length)
-      .fill(0)
-      .map((item, index) => ({
-        key: index.toString(),
-        item: (
-          <SearchItem
-            title="Title"
-            description="description"
-            icon={SearchItemIcons.PLACEHOLDER}
-            onPress={() => {
-              modalControllerDispatch({
-                event: "OPEN_DESTINATION",
-                payload: {
-                  title: "Test",
-                  address: "Test",
-                },
-              });
-            }}
-          />
-        ),
-      })),
+    // ...Array(debouncedSearchQuery.length)
+    //   .fill(0)
+    //   .map((item, index) => ({
+    //     key: index.toString(),
+    //     item: (
+    //       <SearchItem
+    //         title="Title"
+    //         description="description"
+    //         icon={SearchItemIcons.PLACEHOLDER}
+    //         onPress={() => {
+    //           modalControllerDispatch({
+    //             event: "OPEN_DESTINATION",
+    //             payload: {
+    //               title: "Test",
+    //               address: "Test",
+    //             },
+    //           });
+    //         }}
+    //       />
+    //     ),
+    //   })),
   ];
 
   return (

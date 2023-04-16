@@ -1,3 +1,4 @@
+
 import { RTS_GOOGLE_API_KEY } from "@env";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ import {
   addViewingRoute,
   deleteViewingRoute,
 } from "../RTSMapView/mapPreferences";
+
 
 
 
@@ -164,6 +166,32 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
       enabled: short_name !== undefined,
     });
 
+
+    const getClosestBus = (vehicles, currPdist, currPid) => {
+      let psngld = vehicles[0]["psgld"];
+      let pdist = vehicles[0]["pdist"];
+      let buspid = vehicles[0]["pid"];
+
+      for(let i = 0; i < vehicles.length; i ++) {
+        if(currPid === vehicles[i]["pid"]) {
+          if(vehicles[i]["pdist"] < currPdist && vehicles[i]["pdist"]  > pdist) {
+            pdist = vehicles[i]["pdist"]
+            buspid = vehicles[i]["pid"]
+            psngld = vehicles[i]["psgld"]
+          }
+        }
+        else if (buspid === vehicles[i]["pid"]) {
+          if(pdist < vehicles[i]["pdist"]) {
+            pdist = vehicles[i]["pdist"]
+            buspid = vehicles[i]["pid"]
+            psngld = vehicles[i]["psgld"]
+          }
+        }
+      }
+
+      return { psngld, pdist, buspid }
+    }
+
     async function handleGetPredictions () {
       // mock data
       // lat lon of start stop
@@ -185,14 +213,16 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         //   pids[idx] = parseInt(pids[idx])
         // }
         const origin = await getNearestStop(startLng, startLat, pids);
+        const currPdist = origin["pdist"];
+        const currPid = origin["pid"];
         const destination = await getNearestStop(endLng, endLat, pids);
-        const psngld = vehicles[0]["psgld"];
-        const pdist = vehicles[0]["pdist"];
-        const buspid = vehicles[0]["pid"]
+        const { psngld, pdist, buspid }  = getClosestBus(vehicles, currPdist, currPid);
+        console.log("DETES", psngld, pdist, buspid )
         if(buspid) {
           if(buspid === pids[0]) {
             await getTimeTil(pids[0],pids[1],pdist,origin[1]["stop_id"], psngld, currentHour.toString() );
           } else {
+
             await getTimeTil(pids[1],pids[0],pdist,origin[1]["stop_id"], psngld, currentHour.toString() );
           }
 
@@ -266,7 +296,6 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         });
 
         const data = await res.json();
-        console.log(data)
 
         setDuration(Math.round(parseInt(data["bus_to_end"]) / 60).toString());
       } catch (error) {
@@ -421,11 +450,11 @@ const DestinationModal = forwardRef<DestinationModalRef, Props>(
         {timeToArrival && duration && (
           <>
             <Text style={styles.infoText}>
-              Time to arrival:{" "}
+              Time to bus arrival:{" "}
               <Text style={styles.bold}>{timeToArrival} minutes</Text>
             </Text>
             <Text style={styles.infoText}>
-              Duration: <Text style={styles.bold}>{duration} minutes</Text>
+              Trip Time: <Text style={styles.bold}>{duration} minutes</Text>
             </Text>
           </>
         )}
