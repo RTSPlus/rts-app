@@ -103,7 +103,7 @@ export default function RTSMapView(props: ViewProps) {
       {...props}
       initialRegion={initialRegion}
       showsUserLocation
-      followsUserLocation
+      followsUserLocation={false}
     >
       {match(mapViewState.value as RTSMapViewMachineStates)
         .with("empty", () => <></>)
