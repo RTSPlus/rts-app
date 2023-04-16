@@ -54,9 +54,6 @@ export default function Nearby() {
       <View style={styles.sectionBody}>
         <RouteCircleItem />
         <View style={{ width: 30 }} />
-        <RouteCircleItem />
-        <View style={{ width: 20 }} />
-        <RouteCircleItem />
       </View>
     </View>
   );
